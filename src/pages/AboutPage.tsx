@@ -79,7 +79,7 @@ export const AboutPage: React.FC<AboutPageProps> = ({ setActivePage }) => {
   ];
 
   return (
-    <div className="pt-32 sm:pt-40 pb-24 space-y-24">
+    <div className="pt-10 sm:pt-14 pb-20 space-y-16 sm:space-y-20">
       {/* Top Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">

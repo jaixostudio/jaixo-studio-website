@@ -107,9 +107,9 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
   };
 
   return (
-    <div className="space-y-24 sm:space-y-32">
+    <div className="space-y-16 sm:space-y-20">
       {/* ===================== HERO SECTION ===================== */}
-      <section className="relative pt-32 sm:pt-40 pb-16 sm:pb-24 overflow-hidden">
+      <section className="relative pt-10 sm:pt-14 pb-10 sm:pb-14 overflow-hidden">
         {/* Subtle background radial accent */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-[#078BFF]/10 blur-[130px] rounded-full pointer-events-none" />
         <div className="absolute inset-0 bg-grid-pattern opacity-30 pointer-events-none" />
@@ -176,7 +176,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
             {/* Right Hero Visual Composition - Clean Minimalist Poster Showcase */}
             <div className="lg:col-span-5 relative">
               <div className="relative mx-auto max-w-lg lg:max-w-none flex flex-col items-center">
-                {/* Main Clean Showcase Frame - Zero Obscuring Overlays */}
+                {/* Main Clean Showcase Frame - 100% Zero Obscuring Overlays */}
                 <div 
                   className="relative w-full rounded-2xl overflow-hidden border border-[#252B36] bg-[#0A0E17] shadow-2xl group aspect-[3/4] flex items-center justify-center p-3 sm:p-4 select-none cursor-pointer"
                   onMouseEnter={() => setIsCarouselHovered(true)}
@@ -209,39 +209,15 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
                       );
                     })}
                   </div>
-
-                  {/* Previous Arrow Button */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePrevPoster();
-                    }}
-                    aria-label="Previous poster"
-                    className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-[#080B12]/80 hover:bg-[#078BFF] text-[#F5F5F2] hover:text-white border border-[#252B36] flex items-center justify-center backdrop-blur-md transition-all duration-200 opacity-60 group-hover:opacity-100 hover:scale-110 shadow-xl cursor-pointer"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-
-                  {/* Next Arrow Button */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleNextPoster();
-                    }}
-                    aria-label="Next poster"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-[#080B12]/80 hover:bg-[#078BFF] text-[#F5F5F2] hover:text-white border border-[#252B36] flex items-center justify-center backdrop-blur-md transition-all duration-200 opacity-60 group-hover:opacity-100 hover:scale-110 shadow-xl cursor-pointer"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
                 </div>
 
-                {/* Compact Caption & Indicators BELOW Poster (Outside Artwork Area) */}
+                {/* Gallery Controls & Caption Bar BELOW Artwork Area */}
                 {activePostersList[currentPosterIndex] && (
-                  <div className="w-full pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 px-1">
-                    {/* Compact Project Caption: Title & Category */}
+                  <div className="w-full pt-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 px-1">
+                    {/* Compact Project Caption: Title, Category & Counter */}
                     <div 
                       onClick={() => openProjectModal(activePostersList[currentPosterIndex])}
-                      className="text-center sm:text-left cursor-pointer group flex-1 min-w-0"
+                      className="cursor-pointer group flex-1 min-w-0 text-center sm:text-left"
                     >
                       <div className="flex items-center justify-center sm:justify-start gap-2">
                         <span className="text-[11px] font-heading font-semibold uppercase tracking-wider text-[#078BFF]">
@@ -251,7 +227,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
                           {currentPosterIndex + 1} / {activePostersList.length}
                         </span>
                         {isCarouselHovered && (
-                          <span className="text-[9px] font-mono uppercase text-amber-400 font-semibold px-1.5 py-0.5 rounded bg-amber-400/10 border border-amber-400/20">
+                          <span className="text-[9px] font-mono uppercase text-amber-400 font-semibold px-1.5 py-0.2 rounded bg-amber-400/10 border border-amber-400/20">
                             Paused
                           </span>
                         )}
@@ -261,20 +237,45 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
                       </h4>
                     </div>
 
-                    {/* Pagination Indicators Placed Neatly Below Poster */}
-                    <div className="flex items-center gap-1.5 shrink-0 py-1">
-                      {activePostersList.map((_, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => handleSelectPoster(idx)}
-                          aria-label={`Go to poster ${idx + 1}`}
-                          className={`transition-all duration-300 rounded-full cursor-pointer ${
-                            idx === currentPosterIndex
-                              ? 'w-5 h-1.5 bg-[#078BFF] shadow-[0_0_8px_#078BFF]'
-                              : 'w-1.5 h-1.5 bg-[#A5AAB5]/30 hover:bg-[#A5AAB5]'
-                          }`}
-                        />
-                      ))}
+                    {/* Gallery Navigation Controls: Prev Button, Indicators, Next Button */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePrevPoster();
+                        }}
+                        aria-label="Previous poster"
+                        className="w-8 h-8 rounded-lg bg-[#10141D] hover:bg-[#078BFF] text-[#A5AAB5] hover:text-white border border-[#252B36] hover:border-[#078BFF] flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+
+                      {/* Pagination Indicators */}
+                      <div className="flex items-center gap-1.5 px-1.5">
+                        {activePostersList.map((_, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => handleSelectPoster(idx)}
+                            aria-label={`Go to poster ${idx + 1}`}
+                            className={`transition-all duration-300 rounded-full cursor-pointer ${
+                              idx === currentPosterIndex
+                                ? 'w-5 h-1.5 bg-[#078BFF] shadow-[0_0_8px_#078BFF]'
+                                : 'w-1.5 h-1.5 bg-[#A5AAB5]/30 hover:bg-[#A5AAB5]'
+                            }`}
+                          />
+                        ))}
+                      </div>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleNextPoster();
+                        }}
+                        aria-label="Next poster"
+                        className="w-8 h-8 rounded-lg bg-[#10141D] hover:bg-[#078BFF] text-[#A5AAB5] hover:text-white border border-[#252B36] hover:border-[#078BFF] flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                 )}
@@ -285,7 +286,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
       </section>
 
       {/* ===================== STUDIO STATEMENT ===================== */}
-      <section className="border-y border-[#252B36] bg-[#0A0E17] py-16">
+      <section className="border-y border-[#252B36] bg-[#0A0E17] py-12 sm:py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-4">
@@ -310,7 +311,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
 
       {/* ===================== SERVICES OVERVIEW ===================== */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-12 border-b border-[#252B36]">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 sm:pb-8 border-b border-[#252B36]">
           <div>
             <span className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-[#078BFF]">
               What We Do
@@ -331,12 +332,12 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
           </button>
         </div>
 
-        {/* Editorial Asymmetric Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-10">
+        {/* Editorial Services Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-8 sm:pt-10">
           {services.map((service, index) => (
             <div
               key={service.id}
-              className="group relative p-8 rounded-2xl bg-[#0F131D] border border-[#252B36] hover:border-[#078BFF]/60 transition-all duration-300 flex flex-col justify-between"
+              className="group relative p-7 rounded-2xl bg-[#0F131D] border border-[#252B36] hover:border-[#078BFF]/60 transition-all duration-300 flex flex-col justify-between h-full shadow-lg"
             >
               <div className="space-y-4">
                 {/* Top Service Number & Icon */}
@@ -349,27 +350,27 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
                   </div>
                 </div>
 
-                <h3 className="text-xl font-heading font-bold text-[#F5F5F2] group-hover:text-white transition-colors">
+                <h3 className="text-lg sm:text-xl font-heading font-bold text-[#F5F5F2] group-hover:text-white transition-colors">
                   {service.title}
                 </h3>
 
-                <p className="text-xs text-[#A5AAB5] leading-relaxed line-clamp-3">
+                <p className="text-sm text-[#A5AAB5] leading-relaxed pt-0.5">
                   {service.description}
                 </p>
 
                 {/* Key Deliverables Highlights */}
-                <div className="pt-2 space-y-1.5 border-t border-[#252B36]/60">
+                <div className="pt-3 space-y-2 border-t border-[#252B36]/60">
                   {service.included.slice(0, 3).map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-2 text-[11px] text-[#A5AAB5]">
-                      <span className="w-1 h-1 rounded-full bg-[#078BFF]" />
-                      <span className="line-clamp-1">{item}</span>
+                    <div key={idx} className="flex items-start gap-2 text-xs text-[#A5AAB5]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#078BFF] mt-1.5 shrink-0" />
+                      <span className="leading-snug">{item}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Bottom Price & Quick CTA */}
-              <div className="pt-6 mt-6 border-t border-[#252B36] flex items-center justify-between">
+              <div className="pt-5 mt-5 border-t border-[#252B36] flex items-center justify-between">
                 <div>
                   <span className="text-[10px] uppercase tracking-wider text-[#A5AAB5] block font-heading">
                     Investment
@@ -381,7 +382,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
 
                 <button
                   onClick={() => openQuickEnquiry(service.title)}
-                  className="px-3.5 py-1.5 rounded-lg bg-[#10141D] hover:bg-[#078BFF] text-[#F5F5F2] hover:text-white text-xs font-medium tracking-wide transition-colors border border-[#252B36] hover:border-[#078BFF] cursor-pointer"
+                  className="px-4 py-1.5 rounded-lg bg-[#10141D] hover:bg-[#078BFF] text-[#F5F5F2] hover:text-white text-xs font-medium tracking-wide transition-colors border border-[#252B36] hover:border-[#078BFF] cursor-pointer"
                 >
                   Enquire
                 </button>
@@ -393,7 +394,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
 
       {/* ===================== FEATURED PROJECTS ===================== */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-12 border-b border-[#252B36]">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 sm:pb-8 border-b border-[#252B36]">
           <div>
             <span className="text-xs font-heading font-semibold uppercase tracking-[0.2em] text-[#078BFF]">
               Selected Works
@@ -415,36 +416,35 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
         </div>
 
         {/* Featured Projects Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 pt-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 pt-8 sm:pt-10">
           {featuredProjects.map((project) => (
             <div
               key={project.id}
               onClick={() => openProjectModal(project)}
-              className="group cursor-pointer rounded-2xl bg-[#0F131D] border border-[#252B36] hover:border-[#078BFF]/60 transition-all duration-300 overflow-hidden flex flex-col justify-between"
+              className="group cursor-pointer rounded-2xl bg-[#0F131D] border border-[#252B36] hover:border-[#078BFF]/60 transition-all duration-300 overflow-hidden flex flex-col justify-between h-full shadow-lg"
             >
-              <div className="relative overflow-hidden bg-[#080B12] aspect-[3/4] flex items-center justify-center p-3">
+              <div className="relative overflow-hidden bg-[#0A0E17] aspect-[3/4] flex items-center justify-center p-3 sm:p-4">
                 <img
                   src={project.previewImage}
                   alt={project.title}
                   loading="lazy"
-                  className="w-full h-full object-contain rounded-lg transition-transform duration-500 group-hover:scale-[1.02]"
+                  className="w-full h-full object-contain rounded-lg transition-transform duration-500 group-hover:scale-[1.02] drop-shadow-xl"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#080B12] via-transparent to-transparent opacity-40 group-hover:opacity-75 transition-opacity" />
                 
                 {/* Category & Year Tag */}
-                <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#080B12]/90 backdrop-blur-md border border-[#252B36] text-[10px] font-heading font-semibold text-[#078BFF] uppercase tracking-wider line-clamp-1 max-w-[200px]">
+                <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#080B12]/85 backdrop-blur-md border border-[#252B36] text-[10px] font-heading font-semibold text-[#078BFF] uppercase tracking-wider line-clamp-1 max-w-[200px]">
                     {project.category}
                   </span>
                   {project.year && (
-                    <span className="px-2 py-0.5 rounded bg-[#10141D]/90 border border-[#252B36] text-[10px] text-[#A5AAB5] font-mono">
+                    <span className="px-2 py-0.5 rounded bg-[#10141D]/85 border border-[#252B36] text-[10px] text-[#A5AAB5] font-mono">
                       {project.year}
                     </span>
                   )}
                 </div>
 
                 {/* Hover Action */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px]">
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/30 backdrop-blur-[2px]">
                   <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[#078BFF] text-white text-xs font-semibold uppercase tracking-wider shadow-lg">
                     <Eye className="w-4 h-4" />
                     <span>View Project</span>
@@ -452,7 +452,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
                 </div>
               </div>
 
-              <div className="p-5 space-y-3 flex-1 flex flex-col justify-between bg-[#0F131D]">
+              <div className="p-5 sm:p-6 space-y-3 flex-1 flex flex-col justify-between bg-[#0F131D]">
                 <div className="space-y-1.5">
                   {project.client && (
                     <div className="flex items-center gap-1.5 text-[11px] text-[#A5AAB5] line-clamp-1">
@@ -460,11 +460,11 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
                       <span>{project.client}</span>
                     </div>
                   )}
-                  <h3 className="text-base font-heading font-bold text-[#F5F5F2] group-hover:text-white transition-colors line-clamp-1">
+                  <h3 className="text-base font-heading font-bold text-[#F5F5F2] group-hover:text-[#078BFF] transition-colors line-clamp-1">
                     {project.title}
                   </h3>
                   {project.designType && (
-                    <div className="flex items-center gap-1.5 text-[10px] text-[#078BFF] font-medium">
+                    <div className="flex items-center gap-1.5 text-[11px] text-[#078BFF] font-medium">
                       <Layers className="w-3 h-3 shrink-0" />
                       <span className="line-clamp-1">{project.designType}</span>
                     </div>

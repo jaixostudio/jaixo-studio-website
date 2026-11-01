@@ -126,17 +126,17 @@ export const Footer: React.FC<FooterProps> = ({ setActivePage, onOpenAdmin }) =>
             <h4 className="text-xs font-heading font-semibold uppercase tracking-wider text-[#F5F5F2]">
               Connect
             </h4>
-            <ul className="space-y-3 text-xs text-[#A5AAB5]">
+            <ul className="space-y-3.5 text-xs text-[#A5AAB5]">
               <li>
                 <a
                   href={siteConfig.instagramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-[#F5F5F2] hover:text-[#078BFF] transition-colors group"
+                  className="flex items-center gap-2.5 text-sm text-[#F5F5F2] hover:text-[#078BFF] transition-colors group"
                 >
-                  <InstagramIcon className="w-4 h-4 text-[#078BFF]" />
-                  <span>{siteConfig.instagramHandle}</span>
-                  <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <InstagramIcon className="w-4 h-4 text-[#078BFF] shrink-0" />
+                  <span className="font-medium">{siteConfig.instagramHandle}</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all text-[#078BFF]" />
                 </a>
               </li>
               <li>
@@ -144,26 +144,30 @@ export const Footer: React.FC<FooterProps> = ({ setActivePage, onOpenAdmin }) =>
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-[#F5F5F2] hover:text-[#078BFF] transition-colors group"
+                  className="flex items-center gap-2.5 text-sm text-[#F5F5F2] hover:text-[#078BFF] transition-colors group"
                 >
-                  <MessageCircle className="w-4 h-4 text-[#078BFF]" />
-                  <span>WhatsApp Chat</span>
-                  <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <MessageCircle className="w-4 h-4 text-[#078BFF] shrink-0" />
+                  <div className="flex flex-col">
+                    <span className="font-medium">WhatsApp</span>
+                    <span className="text-[11px] text-[#A5AAB5] font-mono">{siteConfig.whatsappNumber}</span>
+                  </div>
+                  <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all text-[#078BFF] ml-auto" />
                 </a>
               </li>
               <li>
                 <a
                   href={`mailto:${siteConfig.contactEmail}`}
-                  className="flex items-center gap-2 text-[#F5F5F2] hover:text-[#078BFF] transition-colors group"
+                  className="flex items-center gap-2.5 text-sm text-[#F5F5F2] hover:text-[#078BFF] transition-colors group"
                 >
-                  <Mail className="w-4 h-4 text-[#078BFF]" />
-                  <span className="truncate">{siteConfig.contactEmail}</span>
+                  <Mail className="w-4 h-4 text-[#078BFF] shrink-0" />
+                  <span className="font-medium truncate">{siteConfig.contactEmail}</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all text-[#078BFF] shrink-0" />
                 </a>
               </li>
               <li className="pt-2">
                 <button
                   onClick={() => openQuickEnquiry()}
-                  className="w-full text-center px-3 py-2 rounded-lg bg-[#10141D] hover:bg-[#252B36] border border-[#252B36] text-[#078BFF] text-xs font-medium transition-colors cursor-pointer"
+                  className="w-full text-center px-3.5 py-2.5 rounded-lg bg-[#10141D] hover:bg-[#078BFF] text-[#078BFF] hover:text-white border border-[#252B36] hover:border-[#078BFF] text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-sm"
                 >
                   Quick Project Enquiry
                 </button>

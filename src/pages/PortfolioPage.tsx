@@ -37,7 +37,7 @@ export const PortfolioPage: React.FC = () => {
   });
 
   return (
-    <div className="pt-32 sm:pt-40 pb-24 space-y-12">
+    <div className="pt-10 sm:pt-14 pb-20 space-y-12">
       {/* Top Header */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl space-y-4">
@@ -148,11 +148,8 @@ export const PortfolioPage: React.FC = () => {
                     src={project.previewImage}
                     alt={project.title}
                     loading="lazy"
-                    className="w-full h-full object-contain rounded-lg transition-transform duration-500 group-hover:scale-[1.02]"
+                    className="w-full h-full object-contain rounded-lg transition-transform duration-500 group-hover:scale-[1.02] drop-shadow-xl"
                   />
-
-                  {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#080B12] via-transparent to-transparent opacity-40 group-hover:opacity-75 transition-opacity" />
 
                   {/* Top Category Badge */}
                   <div className="absolute top-3 left-3 right-3 flex items-center justify-between">

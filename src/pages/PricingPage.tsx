@@ -19,7 +19,7 @@ export const PricingPage: React.FC = () => {
   const cleanPhone = siteConfig.whatsappNumber.replace(/[^0-9]/g, '');
 
   return (
-    <div className="pt-32 sm:pt-40 pb-24 space-y-20">
+    <div className="pt-10 sm:pt-14 pb-20 space-y-16 sm:space-y-20">
       {/* Top Header */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl space-y-4">

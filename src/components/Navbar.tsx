@@ -38,10 +38,10 @@ export const Navbar: React.FC<NavbarProps> = ({ activePage, setActivePage, onOpe
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`sticky top-0 z-40 w-full transition-all duration-300 ${
         isScrolled
-          ? 'bg-[#080B12]/90 backdrop-blur-md border-b border-[#252B36] py-3.5 shadow-2xl shadow-black/40'
-          : 'bg-transparent py-5 border-b border-[#252B36]/30'
+          ? 'bg-[#080B12]/95 backdrop-blur-md border-b border-[#252B36] py-3.5 shadow-2xl shadow-black/50'
+          : 'bg-[#080B12]/90 backdrop-blur-md py-4 border-b border-[#252B36]/60'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
