@@ -173,159 +173,111 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
               </div>
             </div>
 
-            {/* Right Hero Visual Composition - Automated Poster Carousel */}
+            {/* Right Hero Visual Composition - Clean Minimalist Poster Showcase */}
             <div className="lg:col-span-5 relative">
-              <div className="relative mx-auto max-w-lg lg:max-w-none">
-                {/* Main Featured Carousel Card with Actual Design */}
+              <div className="relative mx-auto max-w-lg lg:max-w-none flex flex-col items-center">
+                {/* Main Clean Showcase Frame - Zero Obscuring Overlays */}
                 <div 
-                  className="relative rounded-2xl overflow-hidden border border-[#252B36] bg-[#080B12] shadow-2xl group aspect-[3/4] flex items-center justify-center p-3 select-none"
+                  className="relative w-full rounded-2xl overflow-hidden border border-[#252B36] bg-[#0A0E17] shadow-2xl group aspect-[3/4] flex items-center justify-center p-3 sm:p-4 select-none cursor-pointer"
                   onMouseEnter={() => setIsCarouselHovered(true)}
                   onMouseLeave={() => setIsCarouselHovered(false)}
                   onTouchStart={handleTouchStart}
                   onTouchMove={handleTouchMove}
                   onTouchEnd={handleTouchEnd}
+                  onClick={() => openProjectModal(activePostersList[currentPosterIndex])}
                 >
-                  {/* Rotating Poster Images with Smooth Fade & Scale Transition */}
-                  <div 
-                    className="relative w-full h-full overflow-hidden rounded-lg cursor-pointer"
-                    onClick={() => openProjectModal(activePostersList[currentPosterIndex])}
-                  >
+                  {/* Rotating Complete Poster with Smooth Crossfade & object-contain */}
+                  <div className="relative w-full h-full flex items-center justify-center">
                     {activePostersList.map((poster, index) => {
                       const isActive = index === currentPosterIndex;
                       return (
                         <div
                           key={poster.id || index}
-                          className={`absolute inset-0 transition-all duration-700 ease-in-out ${
+                          className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ease-in-out ${
                             isActive
-                              ? 'opacity-100 scale-100 z-10 pointer-events-auto'
-                              : 'opacity-0 scale-[1.03] z-0 pointer-events-none'
+                              ? 'opacity-100 z-10 pointer-events-auto'
+                              : 'opacity-0 z-0 pointer-events-none'
                           }`}
                         >
                           <img
                             src={poster.previewImage}
                             alt={poster.title}
-                            className="w-full h-full object-contain rounded-lg"
+                            className="w-full h-full object-contain rounded-lg drop-shadow-2xl"
                             loading={index <= 1 ? 'eager' : 'lazy'}
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#080B12] via-transparent to-transparent opacity-60" />
                         </div>
                       );
                     })}
                   </div>
 
-                  {/* 6. Clickable Previous Arrow */}
+                  {/* Previous Arrow Button */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handlePrevPoster();
                     }}
                     aria-label="Previous poster"
-                    className="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-[#080B12]/80 hover:bg-[#078BFF] text-[#F5F5F2] hover:text-white border border-[#252B36] flex items-center justify-center backdrop-blur-md transition-all duration-200 opacity-70 group-hover:opacity-100 hover:scale-105 shadow-xl cursor-pointer"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-[#080B12]/80 hover:bg-[#078BFF] text-[#F5F5F2] hover:text-white border border-[#252B36] flex items-center justify-center backdrop-blur-md transition-all duration-200 opacity-60 group-hover:opacity-100 hover:scale-110 shadow-xl cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
 
-                  {/* 6. Clickable Next Arrow */}
+                  {/* Next Arrow Button */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleNextPoster();
                     }}
                     aria-label="Next poster"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-[#080B12]/80 hover:bg-[#078BFF] text-[#F5F5F2] hover:text-white border border-[#252B36] flex items-center justify-center backdrop-blur-md transition-all duration-200 opacity-70 group-hover:opacity-100 hover:scale-105 shadow-xl cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-[#080B12]/80 hover:bg-[#078BFF] text-[#F5F5F2] hover:text-white border border-[#252B36] flex items-center justify-center backdrop-blur-md transition-all duration-200 opacity-60 group-hover:opacity-100 hover:scale-110 shadow-xl cursor-pointer"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
+                </div>
 
-                  {/* 6. Pagination Indicators & Hover Pause Badge */}
-                  <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#080B12]/85 backdrop-blur-md border border-[#252B36] shadow-lg">
-                    {activePostersList.map((_, idx) => (
-                      <button
-                        key={idx}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSelectPoster(idx);
-                        }}
-                        aria-label={`Go to poster ${idx + 1}`}
-                        className={`transition-all duration-300 rounded-full cursor-pointer ${
-                          idx === currentPosterIndex
-                            ? 'w-6 h-1.5 bg-[#078BFF] shadow-[0_0_8px_#078BFF]'
-                            : 'w-1.5 h-1.5 bg-[#A5AAB5]/40 hover:bg-[#A5AAB5]'
-                        }`}
-                      />
-                    ))}
-                    {isCarouselHovered && (
-                      <span className="ml-1.5 text-[9px] font-mono uppercase text-amber-400 font-semibold tracking-wider">
-                        Paused
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Floating Detail Overlay */}
-                  {activePostersList[currentPosterIndex] && (
+                {/* Compact Caption & Indicators BELOW Poster (Outside Artwork Area) */}
+                {activePostersList[currentPosterIndex] && (
+                  <div className="w-full pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 px-1">
+                    {/* Compact Project Caption: Title & Category */}
                     <div 
-                      className="absolute bottom-4 left-4 right-4 z-20 p-3.5 sm:p-4 rounded-xl bg-[#080B12]/95 border border-[#252B36] backdrop-blur-md flex items-center justify-between shadow-2xl transition-all duration-300 cursor-pointer"
                       onClick={() => openProjectModal(activePostersList[currentPosterIndex])}
+                      className="text-center sm:text-left cursor-pointer group flex-1 min-w-0"
                     >
-                      <div className="space-y-0.5 min-w-0 pr-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-heading font-semibold uppercase tracking-wider text-[#078BFF] truncate">
-                            {activePostersList[currentPosterIndex].category}
-                          </span>
-                          <span className="text-[10px] text-[#A5AAB5] font-mono shrink-0">
-                            {currentPosterIndex + 1} / {activePostersList.length}
-                          </span>
-                        </div>
-                        <h4 className="text-xs sm:text-sm font-heading font-bold text-[#F5F5F2] truncate">
-                          {activePostersList[currentPosterIndex].title}
-                        </h4>
-                        <span className="text-[11px] text-[#A5AAB5] truncate block">
-                          {activePostersList[currentPosterIndex].client || 'JAIXO STUDIO Showcase'}
+                      <div className="flex items-center justify-center sm:justify-start gap-2">
+                        <span className="text-[11px] font-heading font-semibold uppercase tracking-wider text-[#078BFF]">
+                          {activePostersList[currentPosterIndex].category}
                         </span>
+                        <span className="text-[10px] text-[#A5AAB5] font-mono">
+                          {currentPosterIndex + 1} / {activePostersList.length}
+                        </span>
+                        {isCarouselHovered && (
+                          <span className="text-[9px] font-mono uppercase text-amber-400 font-semibold px-1.5 py-0.5 rounded bg-amber-400/10 border border-amber-400/20">
+                            Paused
+                          </span>
+                        )}
                       </div>
-                      <div 
-                        className="w-8 h-8 rounded-lg bg-[#10141D] group-hover:bg-[#078BFF] border border-[#252B36] flex items-center justify-center text-[#F5F5F2] group-hover:text-white transition-colors shrink-0 ml-2 shadow-inner"
-                        title="View Full Poster"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </div>
+                      <h4 className="text-sm font-heading font-medium text-[#F5F5F2] group-hover:text-[#078BFF] transition-colors truncate mt-0.5">
+                        {activePostersList[currentPosterIndex].title}
+                      </h4>
                     </div>
-                  )}
-                </div>
 
-                {/* Floating Micro Badge 1 (Commercial Ad) */}
-                <div 
-                  onClick={() => openProjectModal(projects[2])}
-                  className="hidden sm:flex absolute -bottom-6 -left-6 z-30 p-3 rounded-xl bg-[#0F131D]/95 border border-[#252B36] shadow-2xl backdrop-blur-md items-center gap-3 max-w-[240px] hover:border-[#078BFF]/50 transition-colors cursor-pointer"
-                >
-                  <img
-                    src="/portfolio/03-dudes-footwear-one-day-offer.jpg"
-                    alt="Dude's Footwear Campaign"
-                    className="w-12 h-16 object-contain rounded-md border border-[#252B36] bg-[#080B12]"
-                  />
-                  <div>
-                    <span className="text-[9px] font-heading uppercase tracking-wider text-[#078BFF]">Commercial Ad</span>
-                    <p className="text-xs font-bold text-white leading-tight">Dude's Footwear Deal</p>
-                    <span className="text-[10px] text-[#A5AAB5]">Product Campaign</span>
+                    {/* Pagination Indicators Placed Neatly Below Poster */}
+                    <div className="flex items-center gap-1.5 shrink-0 py-1">
+                      {activePostersList.map((_, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => handleSelectPoster(idx)}
+                          aria-label={`Go to poster ${idx + 1}`}
+                          className={`transition-all duration-300 rounded-full cursor-pointer ${
+                            idx === currentPosterIndex
+                              ? 'w-5 h-1.5 bg-[#078BFF] shadow-[0_0_8px_#078BFF]'
+                              : 'w-1.5 h-1.5 bg-[#A5AAB5]/30 hover:bg-[#A5AAB5]'
+                          }`}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
-
-                {/* Floating Micro Badge 2 (College Technical Event) */}
-                <div 
-                  onClick={() => openProjectModal(projects[42])}
-                  className="hidden sm:flex absolute -top-5 -right-5 z-30 p-3 rounded-xl bg-[#0F131D]/95 border border-[#252B36] shadow-2xl backdrop-blur-md items-center gap-2.5 max-w-[220px] hover:border-[#078BFF]/50 transition-colors cursor-pointer"
-                >
-                  <img
-                    src="/portfolio/43-skct-byte-o-sphere-symposium.jpg"
-                    alt="SKCT Technical Event"
-                    className="w-10 h-14 object-contain rounded-md border border-[#252B36] bg-[#080B12]"
-                  />
-                  <div>
-                    <span className="text-[9px] font-heading uppercase tracking-wider text-[#A5AAB5]">College Tech Event</span>
-                    <p className="text-xs font-semibold text-[#F5F5F2]">SKCT Byte-O-Sphere</p>
-                    <span className="text-[10px] text-[#078BFF]">CSE Symposium</span>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
