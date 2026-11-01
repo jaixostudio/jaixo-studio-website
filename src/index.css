@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-bg: #080B12;
+  --color-secondary-bg: #10141D;
+  --color-accent-blue: #078BFF;
+  --color-accent-hover: #0077e6;
+  --color-accent-subtle: rgba(7, 139, 255, 0.12);
+  --color-primary-text: #F5F5F2;
+  --color-secondary-text: #A5AAB5;
+  --color-border-subtle: #252B36;
+  --color-surface-card: #0F131D;
+  --color-surface-hover: #161C28;
+  --color-off-white: #FAF9F6;
+  --font-heading: "Space Grotesk", "Sora", sans-serif;
+  --font-alt-heading: "Sora", sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Custom Base & Typography */
+body {
+  background-color: #080B12;
+  color: #F5F5F2;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Space Grotesk", "Sora", sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Subtle Editorial Noise/Grid Background */
+.bg-grid-pattern {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(37, 43, 54, 0.35) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(37, 43, 54, 0.35) 1px, transparent 1px);
+}
+
+.bg-dot-pattern {
+  background-image: radial-gradient(rgba(165, 170, 181, 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080B12;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #252B36;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #078BFF;
+}
+
+/* Subtle glass accents used with restraint */
+.editorial-border {
+  border: 1px solid #252B36;
+}
+
+.editorial-border-hover:hover {
+  border-color: rgba(7, 139, 255, 0.5);
+}
+
+/* Smooth transitions */
+* {
+  box-sizing: border-box;
+}

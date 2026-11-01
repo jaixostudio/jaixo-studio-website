@@ -1,0 +1,418 @@
+[
+  {
+    "id": "srv-web-dev",
+    "slug": "website-design-development",
+    "title": "Website Design & Development",
+    "tagline": "High-performance digital flagships engineered for conversions and brand authority.",
+    "category": "Websites",
+    "startingPriceINR": "Starting from ₹14,999",
+    "turnaround": "1 – 3 Weeks",
+    "previewImage": "/images/hero-mockup.jpg",
+    "description": "We architect and code responsive, blazing-fast, visually captivating websites tailored to modern businesses, startups, and creative portfolios. Every build features clean code, semantic structure, responsive optimization, and engaging micro-interactions.",
+    "included": [
+      "Custom UI/UX layout crafted from scratch (no cookie-cutter themes)",
+      "Fully responsive mobile, tablet, and ultra-wide desktop optimization",
+      "Modern tech stack (React / Next.js / Vite / Tailwind CSS or Webflow)",
+      "On-page SEO optimization & metadata configuration",
+      "Contact inquiry forms with direct WhatsApp and email routing",
+      "Speed optimization & Google Core Web Vitals compliance",
+      "Domain & deployment assistance with SSL configuration"
+    ],
+    "deliverables": [
+      "Production-ready deployed website",
+      "Clean source code repository access",
+      "Responsive asset pack (SVG icons, webp images)",
+      "Admin training or documentation for future updates"
+    ],
+    "packages": [
+      {
+        "name": "Starter Landing Page",
+        "priceINR": "Starting from ₹14,999",
+        "description": "Ideal for product launches, events, or service lead generation with maximum visual punch.",
+        "deliverables": [
+          "High-converting single page layout",
+          "Responsive design (Mobile/Desktop)",
+          "Lead capture form with WhatsApp link",
+          "Essential SEO & speed tuning"
+        ],
+        "revisions": "3 Rounds of Revisions",
+        "timeline": "5 – 7 Business Days"
+      },
+      {
+        "name": "Professional Business Web",
+        "priceINR": "Starting from ₹29,999",
+        "popular": true,
+        "description": "Comprehensive multi-page digital presence for established businesses, agencies, and studios.",
+        "deliverables": [
+          "Up to 5 custom designed pages",
+          "Interactive portfolio or service showcase",
+          "Content management integration ready",
+          "Advanced animations & micro-interactions",
+          "Google Analytics & tracking setup"
+        ],
+        "revisions": "Unlimited during design phase",
+        "timeline": "10 – 14 Business Days"
+      },
+      {
+        "name": "Custom Web Application",
+        "priceINR": "Custom Quotation",
+        "description": "Bespoke web applications, custom platforms, client portals, or high-tier creative agency portfolios.",
+        "deliverables": [
+          "Custom architecture & database setup",
+          "Authentication & dynamic dashboard",
+          "Third-party API integrations",
+          "Priority dedicated support & maintenance"
+        ],
+        "revisions": "Milestone-based approvals",
+        "timeline": "3 – 5 Weeks"
+      }
+    ],
+    "additionalOptions": [
+      "Additional custom pages: ₹2,500 / page",
+      "E-commerce payment gateway setup: ₹7,500",
+      "Monthly maintenance & hosting support: ₹2,999 / mo"
+    ]
+  },
+  {
+    "id": "srv-poster-banner",
+    "slug": "poster-banner-design",
+    "title": "Poster & Banner Design",
+    "tagline": "Striking visual storytelling engineered to command immediate attention in physical and digital spaces.",
+    "category": "Posters",
+    "startingPriceINR": "Starting from ₹1,499",
+    "turnaround": "24 – 48 Hours",
+    "previewImage": "/images/poster-art.jpg",
+    "description": "From corporate conferences and music events to promotional brand banners, hoardings, and trade shows, we produce bold, high-resolution compositions that demand eyeballs and communicate your message with punchy clarity.",
+    "included": [
+      "Custom graphic concept aligned with your branding",
+      "Ultra-high resolution CMYK print-ready files (300 DPI)",
+      "Digital RGB formats optimized for screens & social",
+      "Vector typography and crisp iconography",
+      "Standard sizes (A4, A3, A2, A1, Hoardings, Standees, or Custom dimensions)"
+    ],
+    "deliverables": [
+      "Print-ready PDF with bleed and crop marks",
+      "High-resolution JPG & PNG files",
+      "Editable layered source file (AI / PSD / Figma upon request)",
+      "Social media promotional companion square version"
+    ],
+    "packages": [
+      {
+        "name": "Essential Promo Poster",
+        "priceINR": "Starting from ₹1,499",
+        "description": "Single event, webinar, or product announcement poster.",
+        "deliverables": [
+          "1 Design Concept",
+          "Print-ready PDF + Web PNG",
+          "Commercial print resolution (300 DPI)"
+        ],
+        "revisions": "2 Rounds of Revisions",
+        "timeline": "24 – 48 Hours"
+      },
+      {
+        "name": "Campaign Poster & Banner Pack",
+        "priceINR": "Starting from ₹3,499",
+        "popular": true,
+        "description": "Multi-format collateral for exhibitions, retail stores, and online campaigns.",
+        "deliverables": [
+          "2 Unique Creative Concepts",
+          "3 Format adaptions (Poster, Roll-up Standee, Digital Banner)",
+          "Print-ready vector exports + digital assets"
+        ],
+        "revisions": "4 Rounds of Revisions",
+        "timeline": "2 – 3 Business Days"
+      },
+      {
+        "name": "Commercial Hoarding & Event Suite",
+        "priceINR": "Custom Quotation",
+        "description": "Large-scale outdoor flex hoardings, stage backdrops, and full event signage.",
+        "deliverables": [
+          "Full venue branding collateral",
+          "Large-scale flex & billboard specifications",
+          "Vector master files included"
+        ],
+        "revisions": "Unlimited Revisions",
+        "timeline": "3 – 5 Business Days"
+      }
+    ],
+    "additionalOptions": [
+      "Rush 12-hour turnaround: +₹800",
+      "Additional format resize: ₹400 / size",
+      "Layered source file delivery: ₹600"
+    ]
+  },
+  {
+    "id": "srv-invitation-design",
+    "slug": "invitation-design",
+    "title": "Invitation Design",
+    "tagline": "Elegantly curated invitation suites for luxury weddings, private galas, and corporate summits.",
+    "category": "Invitations",
+    "startingPriceINR": "Starting from ₹1,999",
+    "turnaround": "2 – 4 Days",
+    "previewImage": "/images/invitation-suite.jpg",
+    "description": "We craft bespoke invitation stationery that sets the stage for memorable milestones. Combining refined typography, tasteful foil accents, wax-seal motifs, and custom illustrations for royal weddings, formal celebrations, and milestone anniversaries.",
+    "included": [
+      "Exclusive typography pairing and aesthetic curation",
+      "Interactive digital PDF version with clickable Google Map / RSVP links",
+      "High-resolution print-ready files for letterpress, foil stamping, or digital print",
+      "Multi-card cohesive layouts (Save-the-Date, Main Invite, Itinerary, Reception)",
+      "Social messaging / WhatsApp invite adaptations"
+    ],
+    "deliverables": [
+      "Print-ready PDF files with exact bleed",
+      "Interactive clickable digital invite PDF",
+      "Optimized WhatsApp video/gif or image invite",
+      "Curated color & font style guide"
+    ],
+    "packages": [
+      {
+        "name": "Digital WhatsApp Invite",
+        "priceINR": "Starting from ₹1,999",
+        "description": "Modern, mobile-first invitation formatted perfectly for WhatsApp and email broadcasting.",
+        "deliverables": [
+          "Single or two-card digital suite",
+          "Clickable location link & RSVP button",
+          "Ultra-sharp high-res graphics"
+        ],
+        "revisions": "3 Rounds of Revisions",
+        "timeline": "2 Days"
+      },
+      {
+        "name": "Complete Wedding / Event Suite",
+        "priceINR": "Starting from ₹4,999",
+        "popular": true,
+        "description": "Full cohesive stationery suite for weddings, anniversaries, or corporate galas.",
+        "deliverables": [
+          "Save the Date + Main Invite + Itinerary + RSVP + Thank You Card",
+          "Print-ready letterpress / foil prep files",
+          "Interactive digital smartphone version"
+        ],
+        "revisions": "Unlimited Revisions",
+        "timeline": "4 – 5 Days"
+      },
+      {
+        "name": "Animated Video Invite Experience",
+        "priceINR": "Starting from ₹7,499",
+        "description": "Cinematic animated motion invitation with background music and storytelling transitions.",
+        "deliverables": [
+          "30-60 second Full HD 1080p motion video",
+          "Custom typography animation & music synchronization",
+          "Matching static cards included"
+        ],
+        "revisions": "3 Rounds of Revisions",
+        "timeline": "5 – 7 Days"
+      }
+    ],
+    "additionalOptions": [
+      "Custom couple monogram / logo crest: ₹1,500",
+      "Handmade map illustration: ₹1,200",
+      "Language translation formatting: ₹750"
+    ]
+  },
+  {
+    "id": "srv-resume-cv",
+    "slug": "resume-cv-design",
+    "title": "Resume & CV Design",
+    "tagline": "Modern, ATS-compatible executive resumes that position you in the top tier of candidates.",
+    "category": "Resumes",
+    "startingPriceINR": "Starting from ₹1,199",
+    "turnaround": "24 – 48 Hours",
+    "previewImage": "/images/resume-certificate.jpg",
+    "description": "In a competitive global job market, your resume must pass Applicant Tracking Systems (ATS) while impressing hiring managers within the first 6 seconds. We engineer minimalist, structured resumes with impeccable hierarchy and editorial polish.",
+    "included": [
+      "Clean typography and strategic visual hierarchy",
+      "ATS-compliant parsing structure (scannable by Taleo, Greenhouse, Workday)",
+      "Keyword formatting and content layout restructuring",
+      "Clickable hyperlinks (LinkedIn, GitHub, Portfolio, Email)",
+      "Both 1-page executive and 2-page academic/corporate CV formats"
+    ],
+    "deliverables": [
+      "Clean vector PDF ready for applications",
+      "Fully editable Microsoft Word or Google Docs template",
+      "Matching minimalist Cover Letter template",
+      "LinkedIn banner & profile tips guide"
+    ],
+    "packages": [
+      {
+        "name": "Professional ATS Resume",
+        "priceINR": "Starting from ₹1,199",
+        "description": "Clean, modern 1-page layout optimized for ATS and immediate readability.",
+        "deliverables": [
+          "1-Page ATS-formatted PDF",
+          "Editable Word / Docs template",
+          "Clickable links for portfolio & LinkedIn"
+        ],
+        "revisions": "2 Rounds of Revisions",
+        "timeline": "24 Hours"
+      },
+      {
+        "name": "Executive Career Suite",
+        "priceINR": "Starting from ₹2,499",
+        "popular": true,
+        "description": "Comprehensive 1-2 page layout + matching cover letter for senior roles and tech specialists.",
+        "deliverables": [
+          "1-2 Page Executive CV",
+          "Matching Branded Cover Letter",
+          "Editable Source files (Word/Docs)",
+          "LinkedIn header banner design"
+        ],
+        "revisions": "Unlimited Revisions for 7 Days",
+        "timeline": "48 Hours"
+      },
+      {
+        "name": "Creative Portfolio CV",
+        "priceINR": "Starting from ₹3,999",
+        "description": "Visually distinctive layout for designers, architects, photographers, and creative directors.",
+        "deliverables": [
+          "Multi-page visual CV with project snapshot grid",
+          "Interactive portfolio links & media embeds",
+          "Figma / Illustrator editable file included"
+        ],
+        "revisions": "3 Rounds of Revisions",
+        "timeline": "3 Days"
+      }
+    ],
+    "additionalOptions": [
+      "Express 12-Hour delivery: +₹600",
+      "Professional content copywriting/polishing: ₹1,000",
+      "Additional format resize: ₹400"
+    ]
+  },
+  {
+    "id": "srv-certificate-design",
+    "slug": "certificate-design",
+    "title": "Certificate Design",
+    "tagline": "Prestigious, print-ready certificates of appreciation, completion, and corporate achievement.",
+    "category": "Certificates",
+    "startingPriceINR": "Starting from ₹1,299",
+    "turnaround": "24 – 48 Hours",
+    "previewImage": "/images/resume-certificate.jpg",
+    "description": "Celebrate excellence with distinguished certificates that recipients are proud to frame and display. Perfect for university graduations, corporate excellence awards, hackathons, sports tournaments, and professional workshops.",
+    "included": [
+      "Sophisticated border Guilloche / geometric patterns or modern minimal aesthetics",
+      "High-security seal / emblem badge design",
+      "Print-ready CMYK resolution (300 DPI) for gold foil or textured paper",
+      "Automated bulk name generation setup (upon request)",
+      "Digital verification QR code placement ready"
+    ],
+    "deliverables": [
+      "Print-ready master PDF with bleed",
+      "High-res transparent PNG badge & vector seal",
+      "Editable Microsoft Word / PowerPoint or Canva template for quick recipient name updates"
+    ],
+    "packages": [
+      {
+        "name": "Single Award Template",
+        "priceINR": "Starting from ₹1,299",
+        "description": "Single prestigious certificate design for workshops, seminars, or competitions.",
+        "deliverables": [
+          "1 Bespoke Certificate Template",
+          "Print-ready PDF + Web PNG",
+          "Editable template file for changing names"
+        ],
+        "revisions": "2 Rounds of Revisions",
+        "timeline": "24 – 48 Hours"
+      },
+      {
+        "name": "Institution / Tiered Suite",
+        "priceINR": "Starting from ₹2,999",
+        "popular": true,
+        "description": "Gold, Silver, Bronze, and Participant variations for formal events and universities.",
+        "deliverables": [
+          "3-4 Cohesive Tiered Variations",
+          "Custom vector crest / seal badge",
+          "Bulk name merge template file",
+          "Print specification guide"
+        ],
+        "revisions": "4 Rounds of Revisions",
+        "timeline": "2 – 3 Days"
+      },
+      {
+        "name": "Digital Badge & Verifiable Suite",
+        "priceINR": "Custom Quotation",
+        "description": "Comprehensive certification program design with digital shareable LinkedIn badges.",
+        "deliverables": [
+          "Printable certificate + LinkedIn share badge",
+          "Vector source files included",
+          "Automated data-merge setup support"
+        ],
+        "revisions": "Unlimited Revisions",
+        "timeline": "3 – 5 Days"
+      }
+    ],
+    "additionalOptions": [
+      "Foil-stamp / Emboss separation layer: ₹500",
+      "Bulk 50+ personalized PDF export: ₹1,500",
+      "Rush 12-Hour delivery: +₹600"
+    ]
+  },
+  {
+    "id": "srv-social-creatives",
+    "slug": "social-media-advertisement-creatives",
+    "title": "Social Media & Advertisement Creatives",
+    "tagline": "High-converting graphics and thumb-stopping visual campaigns that ignite engagement.",
+    "category": "Social Media Designs",
+    "startingPriceINR": "Starting from ₹2,499",
+    "turnaround": "2 – 4 Days",
+    "previewImage": "/images/social-creatives.jpg",
+    "description": "Fuel your brand with curated, on-brand social media creatives and high-performing paid ads. From Instagram carousels and story campaigns to Google Display banners and Meta ad sets, we create content designed to convert followers into customers.",
+    "included": [
+      "Targeted platform sizing (Instagram Post 1:1, Story 9:16, LinkedIn, Meta Ads)",
+      "Cohesive visual branding (consistent typography, palettes, and layouts)",
+      "Strategic copywriting hooks and call-to-action integration",
+      "Engaging multi-slide educational/promotional carousels",
+      "Conversion-focused ad creative layout"
+    ],
+    "deliverables": [
+      "High-resolution JPG & PNG files optimized for mobile compression",
+      "Editable Figma / Canva project file access (package dependent)",
+      "Cohesive grid preview layout"
+    ],
+    "packages": [
+      {
+        "name": "Starter Content Kit (6 Creatives)",
+        "priceINR": "Starting from ₹2,499",
+        "description": "Ideal for small businesses or monthly campaign highlights.",
+        "deliverables": [
+          "6 Custom Designed Posts / Ad Graphics",
+          "Story companion resize for each",
+          "High-res web-optimized exports"
+        ],
+        "revisions": "3 Rounds of Revisions",
+        "timeline": "2 – 3 Days"
+      },
+      {
+        "name": "Growth & Ads Power Pack (15 Creatives)",
+        "priceINR": "Starting from ₹5,499",
+        "popular": true,
+        "description": "Perfect for aggressive brand building, product launches, or Meta/Google ad campaigns.",
+        "deliverables": [
+          "15 High-converting creative assets",
+          "Includes 2 in-depth swipeable Carousels (up to 7 slides each)",
+          "Performance ad banner variations (Square + Story + Horizontal)",
+          "Editable source templates"
+        ],
+        "revisions": "Unlimited Revisions",
+        "timeline": "4 – 5 Days"
+      },
+      {
+        "name": "Monthly Retainer Creative Partner",
+        "priceINR": "Starting from ₹12,999 / mo",
+        "description": "Dedicated studio design bandwidth on monthly retainer for ongoing high-volume creative output.",
+        "deliverables": [
+          "30+ Creatives per month (Carousels, Ads, Banners, Announcements)",
+          "Priority 24-hour turnaround on requests",
+          "Dedicated creative director review",
+          "Strategy alignment calls"
+        ],
+        "revisions": "Unlimited Ongoing",
+        "timeline": "Ongoing Monthly"
+      }
+    ],
+    "additionalOptions": [
+      "Animated GIF / Motion graphics add-on: ₹750 / post",
+      "Copywriting & caption drafting: ₹1,500 / pack",
+      "Source Canva / Figma transfer: Included in Pro & Retainer"
+    ]
+  }
+]
