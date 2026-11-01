@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ArrowUpRight, 
   ArrowRight, 
@@ -14,7 +14,9 @@ import {
   Award, 
   Layout, 
   Share2,
-  Building2 
+  Building2,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { useStudioData } from '../context/StudioDataContext';
 
@@ -26,6 +28,63 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
   const { siteConfig, services, projects, openProjectModal, openQuickEnquiry } = useStudioData();
 
   const featuredProjects = projects.filter((p) => p.featured).slice(0, 6);
+
+  // Curated list of featured posters for the homepage carousel/slider
+  const carouselPosters = projects.filter((p) => p.featured && p.previewImage).slice(0, 8);
+  const activePostersList = carouselPosters.length > 0 ? carouselPosters : projects.slice(0, 6);
+
+  // Carousel State & Controls
+  const [currentPosterIndex, setCurrentPosterIndex] = useState(0);
+  const [isCarouselHovered, setIsCarouselHovered] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchEndX, setTouchEndX] = useState<number | null>(null);
+
+  // 1. Automatically change to next poster every 2000ms
+  // 4 & 5. Pause on hover, resume on mouse leave
+  // 8. Loop continuously
+  // 9. Clean up interval on unmount to prevent memory leaks
+  useEffect(() => {
+    if (isCarouselHovered || activePostersList.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentPosterIndex((prev) => (prev + 1) % activePostersList.length);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isCarouselHovered, activePostersList.length]);
+
+  const handleNextPoster = () => {
+    setCurrentPosterIndex((prev) => (prev + 1) % activePostersList.length);
+  };
+
+  const handlePrevPoster = () => {
+    setCurrentPosterIndex((prev) => (prev - 1 + activePostersList.length) % activePostersList.length);
+  };
+
+  const handleSelectPoster = (idx: number) => {
+    setCurrentPosterIndex(idx);
+  };
+
+  // 7. Mobile Touch Swipe Handlers
+  const minSwipeDistance = 45;
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEndX(null);
+    setTouchStartX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX || !touchEndX) return;
+    const distance = touchStartX - touchEndX;
+    if (distance > minSwipeDistance) {
+      handleNextPoster(); // Swiped Left -> Next
+    } else if (distance < -minSwipeDistance) {
+      handlePrevPoster(); // Swiped Right -> Previous
+    }
+  };
 
   const getServiceIcon = (category: string) => {
     switch (category) {
@@ -114,42 +173,130 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
               </div>
             </div>
 
-            {/* Right Hero Visual Composition */}
+            {/* Right Hero Visual Composition - Automated Poster Carousel */}
             <div className="lg:col-span-5 relative">
               <div className="relative mx-auto max-w-lg lg:max-w-none">
-                {/* Main Featured Mockup Card with Actual Design */}
+                {/* Main Featured Carousel Card with Actual Design */}
                 <div 
-                  className="relative rounded-2xl overflow-hidden border border-[#252B36] bg-[#080B12] shadow-2xl group cursor-pointer aspect-[3/4] flex items-center justify-center p-3"
-                  onClick={() => openProjectModal(projects[0])}
+                  className="relative rounded-2xl overflow-hidden border border-[#252B36] bg-[#080B12] shadow-2xl group aspect-[3/4] flex items-center justify-center p-3 select-none"
+                  onMouseEnter={() => setIsCarouselHovered(true)}
+                  onMouseLeave={() => setIsCarouselHovered(false)}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
                 >
-                  <img
-                    src="/portfolio/01-shatranj-2-chess-competition.jpg"
-                    alt="Shatranj 2.0 — Online Chess Competition"
-                    className="w-full h-full object-contain rounded-lg transition-transform duration-500 group-hover:scale-102"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#080B12] via-transparent to-transparent opacity-60" />
+                  {/* Rotating Poster Images with Smooth Fade & Scale Transition */}
+                  <div 
+                    className="relative w-full h-full overflow-hidden rounded-lg cursor-pointer"
+                    onClick={() => openProjectModal(activePostersList[currentPosterIndex])}
+                  >
+                    {activePostersList.map((poster, index) => {
+                      const isActive = index === currentPosterIndex;
+                      return (
+                        <div
+                          key={poster.id || index}
+                          className={`absolute inset-0 transition-all duration-700 ease-in-out ${
+                            isActive
+                              ? 'opacity-100 scale-100 z-10 pointer-events-auto'
+                              : 'opacity-0 scale-[1.03] z-0 pointer-events-none'
+                          }`}
+                        >
+                          <img
+                            src={poster.previewImage}
+                            alt={poster.title}
+                            className="w-full h-full object-contain rounded-lg"
+                            loading={index <= 1 ? 'eager' : 'lazy'}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#080B12] via-transparent to-transparent opacity-60" />
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* 6. Clickable Previous Arrow */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePrevPoster();
+                    }}
+                    aria-label="Previous poster"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-[#080B12]/80 hover:bg-[#078BFF] text-[#F5F5F2] hover:text-white border border-[#252B36] flex items-center justify-center backdrop-blur-md transition-all duration-200 opacity-70 group-hover:opacity-100 hover:scale-105 shadow-xl cursor-pointer"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+
+                  {/* 6. Clickable Next Arrow */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNextPoster();
+                    }}
+                    aria-label="Next poster"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-[#080B12]/80 hover:bg-[#078BFF] text-[#F5F5F2] hover:text-white border border-[#252B36] flex items-center justify-center backdrop-blur-md transition-all duration-200 opacity-70 group-hover:opacity-100 hover:scale-105 shadow-xl cursor-pointer"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+
+                  {/* 6. Pagination Indicators & Hover Pause Badge */}
+                  <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#080B12]/85 backdrop-blur-md border border-[#252B36] shadow-lg">
+                    {activePostersList.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSelectPoster(idx);
+                        }}
+                        aria-label={`Go to poster ${idx + 1}`}
+                        className={`transition-all duration-300 rounded-full cursor-pointer ${
+                          idx === currentPosterIndex
+                            ? 'w-6 h-1.5 bg-[#078BFF] shadow-[0_0_8px_#078BFF]'
+                            : 'w-1.5 h-1.5 bg-[#A5AAB5]/40 hover:bg-[#A5AAB5]'
+                        }`}
+                      />
+                    ))}
+                    {isCarouselHovered && (
+                      <span className="ml-1.5 text-[9px] font-mono uppercase text-amber-400 font-semibold tracking-wider">
+                        Paused
+                      </span>
+                    )}
+                  </div>
 
                   {/* Floating Detail Overlay */}
-                  <div className="absolute bottom-4 left-4 right-4 p-4 rounded-xl bg-[#080B12]/95 border border-[#252B36] backdrop-blur-md flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] font-heading font-semibold uppercase tracking-wider text-[#078BFF]">
-                        Event & Promotional Poster
-                      </span>
-                      <h4 className="text-sm font-heading font-bold text-[#F5F5F2]">
-                        Shatranj 2.0 — Online Chess Competition
-                      </h4>
-                      <span className="text-[11px] text-[#A5AAB5]">Rotaract Club of Erode Kalam</span>
+                  {activePostersList[currentPosterIndex] && (
+                    <div 
+                      className="absolute bottom-4 left-4 right-4 z-20 p-3.5 sm:p-4 rounded-xl bg-[#080B12]/95 border border-[#252B36] backdrop-blur-md flex items-center justify-between shadow-2xl transition-all duration-300 cursor-pointer"
+                      onClick={() => openProjectModal(activePostersList[currentPosterIndex])}
+                    >
+                      <div className="space-y-0.5 min-w-0 pr-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-heading font-semibold uppercase tracking-wider text-[#078BFF] truncate">
+                            {activePostersList[currentPosterIndex].category}
+                          </span>
+                          <span className="text-[10px] text-[#A5AAB5] font-mono shrink-0">
+                            {currentPosterIndex + 1} / {activePostersList.length}
+                          </span>
+                        </div>
+                        <h4 className="text-xs sm:text-sm font-heading font-bold text-[#F5F5F2] truncate">
+                          {activePostersList[currentPosterIndex].title}
+                        </h4>
+                        <span className="text-[11px] text-[#A5AAB5] truncate block">
+                          {activePostersList[currentPosterIndex].client || 'JAIXO STUDIO Showcase'}
+                        </span>
+                      </div>
+                      <div 
+                        className="w-8 h-8 rounded-lg bg-[#10141D] group-hover:bg-[#078BFF] border border-[#252B36] flex items-center justify-center text-[#F5F5F2] group-hover:text-white transition-colors shrink-0 ml-2 shadow-inner"
+                        title="View Full Poster"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </div>
                     </div>
-                    <div className="w-8 h-8 rounded-lg bg-[#10141D] border border-[#252B36] flex items-center justify-center text-[#F5F5F2] group-hover:text-[#078BFF] transition-colors shrink-0 ml-2">
-                      <Eye className="w-4 h-4" />
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Floating Micro Badge 1 (Commercial Ad) */}
                 <div 
                   onClick={() => openProjectModal(projects[2])}
-                  className="hidden sm:flex absolute -bottom-6 -left-6 p-3 rounded-xl bg-[#0F131D]/95 border border-[#252B36] shadow-2xl backdrop-blur-md items-center gap-3 max-w-[240px] hover:border-[#078BFF]/50 transition-colors cursor-pointer"
+                  className="hidden sm:flex absolute -bottom-6 -left-6 z-30 p-3 rounded-xl bg-[#0F131D]/95 border border-[#252B36] shadow-2xl backdrop-blur-md items-center gap-3 max-w-[240px] hover:border-[#078BFF]/50 transition-colors cursor-pointer"
                 >
                   <img
                     src="/portfolio/03-dudes-footwear-one-day-offer.jpg"
@@ -166,7 +313,7 @@ export const HomePage: React.FC<HomePageProps> = ({ setActivePage }) => {
                 {/* Floating Micro Badge 2 (College Technical Event) */}
                 <div 
                   onClick={() => openProjectModal(projects[42])}
-                  className="hidden sm:flex absolute -top-5 -right-5 p-3 rounded-xl bg-[#0F131D]/95 border border-[#252B36] shadow-2xl backdrop-blur-md items-center gap-2.5 max-w-[220px] hover:border-[#078BFF]/50 transition-colors cursor-pointer"
+                  className="hidden sm:flex absolute -top-5 -right-5 z-30 p-3 rounded-xl bg-[#0F131D]/95 border border-[#252B36] shadow-2xl backdrop-blur-md items-center gap-2.5 max-w-[220px] hover:border-[#078BFF]/50 transition-colors cursor-pointer"
                 >
                   <img
                     src="/portfolio/43-skct-byte-o-sphere-symposium.jpg"
