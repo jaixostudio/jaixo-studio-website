@@ -20,11 +20,13 @@ import {
   ChevronDown,
   Search,
   Check,
-  AlertCircle
+  AlertCircle,
+  Key,
+  FileText
 } from 'lucide-react';
 import { useStudioData } from '../context/StudioDataContext';
 import type { ProjectCategory, ProjectItem } from '../types';
-import { apiLogin, apiUploadImage, getAuthToken, setAuthToken } from '../services/api';
+import { apiLogin, apiUploadImage, apiChangePassword, getAuthToken, setAuthToken } from '../services/api';
 
 interface AdminPortalProps {
   onClose: () => void;
@@ -91,6 +93,20 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
   const [adminCategoryFilter, setAdminCategoryFilter] = useState<string>('All');
   const [adminFeaturedOnly, setAdminFeaturedOnly] = useState(false);
 
+  // Enquiry filters & notes state
+  const [enquirySearch, setEnquirySearch] = useState('');
+  const [enquiryStatusFilter, setEnquiryStatusFilter] = useState('All');
+  const [enquiryNotesState, setEnquiryNotesState] = useState<Record<string, string>>({});
+  const [notesSaveSuccess, setNotesSaveSuccess] = useState<string | null>(null);
+
+  // Change Password state
+  const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
+  const [currentPasswordInput, setCurrentPasswordInput] = useState('');
+  const [newPasswordInput, setNewPasswordInput] = useState('');
+  const [changePasswordSuccess, setChangePasswordSuccess] = useState('');
+  const [changePasswordError, setChangePasswordError] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+
   const [projectForm, setProjectForm] = useState({
     title: '',
     category: 'Event & Promotional Posters' as ProjectCategory,
@@ -106,22 +122,56 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     featured: false,
   });
 
-  // Authentication with Spring Boot Backend & Fallback
+  // Authentication with Spring Boot Backend (Strict Backend Verification)
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError('');
     const code = passcode.trim();
+    if (!code) {
+      setAuthError('Please enter the administrator passcode.');
+      return;
+    }
     try {
       await apiLogin(code);
       setIsAuthenticated(true);
       await refreshBackendData();
     } catch (err: any) {
-      if (code === 'jaixo2026' || code === 'admin') {
-        setIsAuthenticated(true);
-        setAuthError('');
-      } else {
-        setAuthError(err.message || 'Invalid studio passcode. Default is jaixo2026');
-      }
+      setAuthError(err.message || 'Invalid administrator passcode. Access denied.');
+    }
+  };
+
+  const handleLogout = () => {
+    setAuthToken(null);
+    setIsAuthenticated(false);
+    onClose();
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setChangePasswordError('');
+    setChangePasswordSuccess('');
+    if (!currentPasswordInput || !newPasswordInput) {
+      setChangePasswordError('Both current and new passwords are required.');
+      return;
+    }
+    if (newPasswordInput.length < 6) {
+      setChangePasswordError('New password must be at least 6 characters long.');
+      return;
+    }
+    setIsChangingPassword(true);
+    try {
+      await apiChangePassword(currentPasswordInput, newPasswordInput);
+      setChangePasswordSuccess('Administrator passcode rotated successfully in MySQL database!');
+      setCurrentPasswordInput('');
+      setNewPasswordInput('');
+      setTimeout(() => {
+        setChangePasswordModalOpen(false);
+        setChangePasswordSuccess('');
+      }, 2000);
+    } catch (err: any) {
+      setChangePasswordError(err.message || 'Failed to rotate administrator passcode.');
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
@@ -303,6 +353,30 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
     downloadAnchor.remove();
   };
 
+  const exportEnquiriesCSV = () => {
+    const headers = ['Reference', 'Date', 'Name', 'Email', 'Phone', 'Service', 'Budget', 'Timeline', 'Status', 'Description', 'Notes'];
+    const rows = enquiries.map((e) => [
+      `"${(e.referenceNumber || e.id).replace(/"/g, '""')}"`,
+      `"${(e.timestamp || e.createdAt || '').replace(/"/g, '""')}"`,
+      `"${(e.name || '').replace(/"/g, '""')}"`,
+      `"${(e.email || '').replace(/"/g, '""')}"`,
+      `"${(e.phone || '').replace(/"/g, '""')}"`,
+      `"${(e.service || '').replace(/"/g, '""')}"`,
+      `"${(e.budget || '').replace(/"/g, '""')}"`,
+      `"${(e.timeline || '').replace(/"/g, '""')}"`,
+      `"${(e.status || '').replace(/"/g, '""')}"`,
+      `"${(e.description || '').replace(/"/g, '""')}"`,
+      `"${(e.internalNotes || '').replace(/"/g, '""')}"`,
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute('href', encodeURI(csvContent));
+    downloadAnchor.setAttribute('download', `jaixo_studio_enquiries_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
   // Filter projects in Admin
   const filteredAdminProjects = projects.filter((p) => {
     const matchesSearch = adminSearch === '' || 
@@ -318,6 +392,19 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
 
   const featuredCount = projects.filter((p) => p.featured).length;
 
+  // Filter enquiries in Admin
+  const filteredEnquiries = enquiries.filter((e) => {
+    const matchesSearch = !enquirySearch || 
+      e.name.toLowerCase().includes(enquirySearch.toLowerCase()) ||
+      e.email.toLowerCase().includes(enquirySearch.toLowerCase()) ||
+      (e.phone && e.phone.includes(enquirySearch)) ||
+      (e.referenceNumber && e.referenceNumber.toLowerCase().includes(enquirySearch.toLowerCase())) ||
+      (e.service && e.service.toLowerCase().includes(enquirySearch.toLowerCase()));
+    
+    const matchesStatus = enquiryStatusFilter === 'All' || e.status === enquiryStatusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
   // Lockscreen
   if (!isAuthenticated) {
     return (
@@ -325,7 +412,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
         <div className="relative w-full max-w-md p-8 rounded-3xl bg-[#0F131D] border border-[#252B36] shadow-2xl space-y-6 text-center">
           <button
             onClick={onClose}
-            className="absolute top-5 right-5 p-2 rounded-xl bg-[#10141D] text-[#A5AAB5] hover:text-white"
+            className="absolute top-5 right-5 p-2 rounded-xl bg-[#10141D] text-[#A5AAB5] hover:text-white cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -349,7 +436,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
                 type="password"
                 value={passcode}
                 onChange={(e) => setPasscode(e.target.value)}
-                placeholder="Enter Studio Passcode (Default: jaixo2026)"
+                placeholder="Enter Administrator Passcode"
                 className="w-full px-4 py-3 rounded-xl bg-[#080B12] border border-[#252B36] focus:border-[#078BFF] focus:outline-none text-sm text-center text-[#F5F5F2] placeholder-[#A5AAB5]/40"
               />
               {authError && <p className="text-red-400 text-xs mt-2">{authError}</p>}
@@ -357,14 +444,15 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
 
             <button
               type="submit"
-              className="w-full py-3 rounded-xl bg-[#078BFF] hover:bg-[#0077e6] text-white text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+              className="w-full py-3 rounded-xl bg-[#078BFF] hover:bg-[#0077e6] text-white text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer shadow-lg shadow-[#078BFF]/25"
             >
               Unlock Studio Console
             </button>
           </form>
 
-          <p className="text-[11px] text-[#A5AAB5]/70">
-            Passcode: <code className="text-[#078BFF]">jaixo2026</code>
+          <p className="text-[11px] text-[#A5AAB5]/60 flex items-center justify-center gap-1.5">
+            <Lock className="w-3 h-3 text-[#078BFF]" />
+            <span>Authorized Administrator Access Only</span>
           </p>
         </div>
       </div>
@@ -400,9 +488,19 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
 
             <button
               onClick={() => {
-                setAuthToken(null);
-                setIsAuthenticated(false);
+                setChangePasswordError('');
+                setChangePasswordSuccess('');
+                setChangePasswordModalOpen(true);
               }}
+              title="Rotate Administrator Passcode in MySQL"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#080B12] hover:bg-[#252B36] border border-[#252B36] text-[11px] text-[#078BFF] hover:text-[#38a5ff] transition-colors cursor-pointer"
+            >
+              <Key className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Rotate Passcode</span>
+            </button>
+
+            <button
+              onClick={handleLogout}
               title="Log out of console"
               className="px-2.5 py-1.5 rounded-lg bg-[#080B12] hover:bg-[#252B36] border border-[#252B36] text-[11px] text-[#A5AAB5] hover:text-white transition-colors cursor-pointer"
             >
@@ -1162,83 +1260,333 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({ onClose }) => {
           {/* TAB 4: ENQUIRIES INBOX */}
           {activeTab === 'enquiries' && (
             <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-[#252B36]">
                 <div>
                   <h3 className="text-lg font-heading font-bold text-[#F5F5F2]">
-                    Client Project Enquiries ({enquiries.length})
+                    Client Project Enquiries ({filteredEnquiries.length} of {enquiries.length})
                   </h3>
                   <p className="text-xs text-[#A5AAB5]">
-                    Submitted leads and project briefs captured from the website forms.
+                    Submitted leads and project briefs captured from public website contact forms.
                   </p>
                 </div>
 
-                <button
-                  onClick={exportEnquiriesJSON}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#10141D] hover:bg-[#252B36] border border-[#252B36] text-xs text-[#078BFF] cursor-pointer"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Export to JSON</span>
-                </button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={exportEnquiriesCSV}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#080B12] hover:bg-[#252B36] border border-[#252B36] text-xs font-semibold text-[#078BFF] transition-colors cursor-pointer"
+                    title="Export all enquiries to CSV"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Export CSV</span>
+                  </button>
+
+                  <button
+                    onClick={exportEnquiriesJSON}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#080B12] hover:bg-[#252B36] border border-[#252B36] text-xs font-semibold text-[#A5AAB5] hover:text-white transition-colors cursor-pointer"
+                    title="Export all enquiries to JSON"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Export JSON</span>
+                  </button>
+                </div>
               </div>
 
-              {enquiries.length === 0 ? (
-                <div className="py-12 text-center text-xs text-[#A5AAB5]">
-                  No enquiry submissions found.
+              {/* Filters Bar */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div className="relative">
+                  <Search className="w-4 h-4 text-[#A5AAB5] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={enquirySearch}
+                    onChange={(e) => setEnquirySearch(e.target.value)}
+                    placeholder="Search by client, email, ref, service..."
+                    className="w-full pl-10 pr-3.5 py-2 rounded-xl bg-[#080B12] border border-[#252B36] text-xs text-[#F5F5F2] placeholder-[#A5AAB5]/50 focus:border-[#078BFF] outline-none"
+                  />
+                </div>
+
+                <div>
+                  <select
+                    value={enquiryStatusFilter}
+                    onChange={(e) => setEnquiryStatusFilter(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl bg-[#080B12] border border-[#252B36] text-xs text-[#F5F5F2] focus:border-[#078BFF] outline-none cursor-pointer"
+                  >
+                    <option value="All">All Statuses ({enquiries.length})</option>
+                    <option value="New">Status: New</option>
+                    <option value="Contacted">Status: Contacted</option>
+                    <option value="In Discussion">Status: In Discussion</option>
+                    <option value="Proposal Sent">Status: Proposal Sent</option>
+                    <option value="Confirmed">Status: Confirmed</option>
+                    <option value="Completed">Status: Completed</option>
+                    <option value="Rejected">Status: Rejected</option>
+                  </select>
+                </div>
+
+                {notesSaveSuccess && (
+                  <div className="p-2 rounded-xl bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-2">
+                    <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{notesSaveSuccess}</span>
+                  </div>
+                )}
+              </div>
+
+              {filteredEnquiries.length === 0 ? (
+                <div className="py-16 text-center text-xs text-[#A5AAB5] border border-dashed border-[#252B36] rounded-2xl">
+                  No enquiries matching your current search or status filter.
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {enquiries.map((enq) => (
-                    <div
-                      key={enq.id}
-                      className="p-5 rounded-2xl bg-[#10141D] border border-[#252B36] space-y-3"
-                    >
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-heading font-bold text-sm text-[#F5F5F2]">
-                            {enq.name}
+                  {filteredEnquiries.map((enq) => {
+                    const statusColors: Record<string, string> = {
+                      New: 'bg-[#078BFF]/15 text-[#078BFF] border-[#078BFF]/40',
+                      Contacted: 'bg-amber-500/15 text-amber-400 border-amber-500/40',
+                      'In Discussion': 'bg-purple-500/15 text-purple-400 border-purple-500/40',
+                      'Proposal Sent': 'bg-indigo-500/15 text-indigo-400 border-indigo-500/40',
+                      Confirmed: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40',
+                      Completed: 'bg-teal-500/15 text-teal-400 border-teal-500/40',
+                      Rejected: 'bg-rose-500/15 text-rose-400 border-rose-500/40',
+                    };
+                    const badgeClass = statusColors[enq.status] || 'bg-[#252B36] text-[#A5AAB5] border-[#252B36]';
+                    const currentNotes = enquiryNotesState[enq.id] ?? (enq.internalNotes || '');
+
+                    return (
+                      <div
+                        key={enq.id}
+                        className="p-5 sm:p-6 rounded-2xl bg-[#10141D] border border-[#252B36] space-y-4 hover:border-[#252B36]/80 transition-colors"
+                      >
+                        {/* Top bar: Reference, Date, Status & Delete */}
+                        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#252B36]">
+                          <div className="flex items-center gap-2.5 flex-wrap">
+                            <span className="font-mono text-[11px] px-2.5 py-1 rounded bg-[#080B12] border border-[#252B36] text-[#078BFF] font-semibold">
+                              {enq.referenceNumber || enq.id}
+                            </span>
+                            <span className={`text-[11px] px-2.5 py-0.5 rounded-full font-medium border ${badgeClass}`}>
+                              {enq.status}
+                            </span>
+                            <span className="text-[11px] text-[#A5AAB5]">
+                              {new Date(enq.timestamp || enq.createdAt || Date.now()).toLocaleString()}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={enq.status}
+                              onChange={(e) => updateEnquiryStatus(enq.id, e.target.value as any, currentNotes)}
+                              className="px-3 py-1.5 rounded-xl bg-[#080B12] border border-[#252B36] text-xs font-medium text-[#F5F5F2] focus:border-[#078BFF] outline-none cursor-pointer"
+                            >
+                              <option value="New">Status: New</option>
+                              <option value="Contacted">Status: Contacted</option>
+                              <option value="In Discussion">Status: In Discussion</option>
+                              <option value="Proposal Sent">Status: Proposal Sent</option>
+                              <option value="Confirmed">Status: Confirmed</option>
+                              <option value="Completed">Status: Completed</option>
+                              <option value="Rejected">Status: Rejected</option>
+                            </select>
+
+                            <button
+                              onClick={() => {
+                                if (window.confirm(`Are you sure you want to permanently delete enquiry reference ${enq.referenceNumber || enq.id} from ${enq.name}? This action cannot be undone.`)) {
+                                  deleteEnquiry(enq.id);
+                                }
+                              }}
+                              className="p-2 rounded-xl bg-[#080B12] hover:bg-rose-950/40 text-[#A5AAB5] hover:text-rose-400 border border-[#252B36] hover:border-rose-500/40 transition-colors cursor-pointer"
+                              title="Permanently Delete Enquiry"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Client details & meta */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                          <div>
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-[#A5AAB5] block">Client Name</span>
+                            <span className="font-heading font-bold text-sm text-[#F5F5F2]">{enq.name}</span>
+                          </div>
+
+                          <div>
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-[#A5AAB5] block">Contact</span>
+                            <div className="flex flex-col gap-0.5">
+                              <a href={`mailto:${enq.email}`} className="text-[#078BFF] hover:underline truncate">
+                                {enq.email}
+                              </a>
+                              {enq.phone && (
+                                <a
+                                  href={`https://wa.me/${enq.phone.replace(/[^0-9]/g, '')}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-emerald-400 hover:underline"
+                                >
+                                  WhatsApp: {enq.phone}
+                                </a>
+                              )}
+                            </div>
+                          </div>
+
+                          <div>
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-[#A5AAB5] block">Service & Timeline</span>
+                            <span className="text-white font-medium block">{enq.service}</span>
+                            <span className="text-[#A5AAB5] text-[11px]">{enq.timeline || 'Standard timeline'}</span>
+                          </div>
+
+                          <div>
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-[#A5AAB5] block">Estimated Budget</span>
+                            <span className="text-[#078BFF] font-heading font-bold">{enq.budget}</span>
+                          </div>
+                        </div>
+
+                        {/* Project Description */}
+                        <div>
+                          <span className="text-[10px] uppercase font-bold tracking-wider text-[#A5AAB5] block mb-1">
+                            Project Description & Scope
                           </span>
-                          <span className="text-xs text-[#A5AAB5]">({enq.email})</span>
-                          <span className="text-xs text-[#078BFF]">• {enq.phone}</span>
+                          <div className="p-3.5 rounded-xl bg-[#080B12] border border-[#252B36] text-xs text-[#F5F5F2] leading-relaxed whitespace-pre-wrap">
+                            {enq.description}
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
-                          <select
-                            value={enq.status}
-                            onChange={(e) => updateEnquiryStatus(enq.id, e.target.value as any)}
-                            className="px-2.5 py-1 rounded bg-[#080B12] border border-[#252B36] text-xs text-[#A5AAB5]"
-                          >
-                            <option value="New">Status: New</option>
-                            <option value="In Review">Status: In Review</option>
-                            <option value="Responded">Status: Responded</option>
-                          </select>
-
-                          <button
-                            onClick={() => deleteEnquiry(enq.id)}
-                            className="p-1 rounded bg-[#080B12] text-[#A5AAB5] hover:text-red-400"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                        {/* Internal Studio Notes */}
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-[10px] uppercase font-bold tracking-wider text-[#A5AAB5] flex items-center gap-1.5">
+                              <FileText className="w-3 h-3 text-[#078BFF]" />
+                              Internal Notes & Discussion Log
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                updateEnquiryStatus(enq.id, enq.status, currentNotes);
+                                setNotesSaveSuccess(`Saved notes for ${enq.referenceNumber || enq.name}`);
+                                setTimeout(() => setNotesSaveSuccess(null), 3000);
+                              }}
+                              className="text-[11px] font-semibold text-[#078BFF] hover:text-[#38a5ff] px-2.5 py-0.5 rounded bg-[#080B12] border border-[#252B36] hover:border-[#078BFF]/40 cursor-pointer transition-colors"
+                            >
+                              Save Notes
+                            </button>
+                          </div>
+                          <textarea
+                            rows={2}
+                            value={currentNotes}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setEnquiryNotesState((prev) => ({ ...prev, [enq.id]: val }));
+                            }}
+                            placeholder="Add private studio notes, client call summaries, proposal quotation notes..."
+                            className="w-full px-3.5 py-2 rounded-xl bg-[#080B12] border border-[#252B36] text-xs text-[#F5F5F2] placeholder-[#A5AAB5]/40 focus:border-[#078BFF] outline-none"
+                          />
                         </div>
                       </div>
-
-                      <div className="flex flex-wrap items-center gap-4 text-xs text-[#A5AAB5]">
-                        <div>Service: <strong className="text-white">{enq.service}</strong></div>
-                        <div>Budget: <strong className="text-[#078BFF]">{enq.budget}</strong></div>
-                        <div>Date: <span>{new Date(enq.timestamp).toLocaleDateString()}</span></div>
-                      </div>
-
-                      <div className="p-3 rounded-xl bg-[#080B12] border border-[#252B36] text-xs text-[#A5AAB5] leading-relaxed">
-                        {enq.description}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
           )}
         </div>
       </div>
+
+      {/* Change Password Modal */}
+      {changePasswordModalOpen && (
+        <div className="fixed inset-0 z-60 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-md bg-[#10141D] border border-[#252B36] rounded-2xl p-6 shadow-2xl space-y-5 animate-fade-in">
+            <div className="flex items-center justify-between pb-3 border-b border-[#252B36]">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-[#080B12] border border-[#078BFF]/40 flex items-center justify-center text-[#078BFF]">
+                  <Key className="w-3.5 h-3.5" />
+                </div>
+                <h3 className="text-sm font-heading font-bold text-[#F5F5F2]">
+                  Rotate Administrator Passcode
+                </h3>
+              </div>
+              <button
+                onClick={() => {
+                  setChangePasswordModalOpen(false);
+                  setChangePasswordError('');
+                  setChangePasswordSuccess('');
+                }}
+                className="p-1.5 rounded-lg bg-[#080B12] hover:bg-[#252B36] text-[#A5AAB5] hover:text-white cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-[#A5AAB5] leading-relaxed">
+              Rotate the production studio passcode. Passcodes are securely hashed with BCrypt and persisted to your MySQL database.
+            </p>
+
+            {changePasswordError && (
+              <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{changePasswordError}</span>
+              </div>
+            )}
+
+            {changePasswordSuccess && (
+              <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 text-xs flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 shrink-0" />
+                <span>{changePasswordSuccess}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-heading font-semibold text-[#A5AAB5] uppercase mb-1">
+                  Current Passcode
+                </label>
+                <input
+                  type="password"
+                  value={currentPasswordInput}
+                  onChange={(e) => setCurrentPasswordInput(e.target.value)}
+                  placeholder="Enter current passcode"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#080B12] border border-[#252B36] text-xs text-[#F5F5F2] focus:border-[#078BFF] outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-heading font-semibold text-[#A5AAB5] uppercase mb-1">
+                  New Passcode (min 6 characters)
+                </label>
+                <input
+                  type="password"
+                  value={newPasswordInput}
+                  onChange={(e) => setNewPasswordInput(e.target.value)}
+                  placeholder="Enter secure new passcode"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#080B12] border border-[#252B36] text-xs text-[#F5F5F2] focus:border-[#078BFF] outline-none"
+                  required
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setChangePasswordModalOpen(false);
+                    setChangePasswordError('');
+                    setChangePasswordSuccess('');
+                  }}
+                  className="px-4 py-2 rounded-xl bg-[#080B12] hover:bg-[#252B36] border border-[#252B36] text-xs text-[#A5AAB5] hover:text-white cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isChangingPassword}
+                  className="px-5 py-2 rounded-xl bg-[#078BFF] hover:bg-[#0077e6] disabled:opacity-50 text-white text-xs font-semibold uppercase tracking-wider cursor-pointer flex items-center gap-1.5"
+                >
+                  {isChangingPassword ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Updating...</span>
+                    </>
+                  ) : (
+                    <span>Rotate Passcode</span>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

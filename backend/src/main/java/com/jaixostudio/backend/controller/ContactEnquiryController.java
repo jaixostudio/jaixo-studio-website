@@ -45,11 +45,11 @@ public class ContactEnquiryController {
                 .body(ApiResponse.ok("Enquiry submitted successfully", created));
     }
 
-    @PutMapping("/{id}/status")
+    @RequestMapping(value = "/{id}/status", method = {RequestMethod.PUT, RequestMethod.PATCH})
     public ResponseEntity<ApiResponse<ContactEnquiry>> updateStatus(
             @PathVariable String id,
             @Valid @RequestBody EnquiryStatusDto dto) {
-        ContactEnquiry updated = enquiryService.updateEnquiryStatus(id, dto.getStatus());
+        ContactEnquiry updated = enquiryService.updateEnquiryStatus(id, dto.getStatus(), dto.getInternalNotes());
         return ResponseEntity.ok(ApiResponse.ok("Enquiry status updated", updated));
     }
 

@@ -33,4 +33,11 @@ public class AuthController {
         boolean valid = authService.verifyToken(authHeader);
         return ResponseEntity.ok(ApiResponse.ok("Token verification status", valid));
     }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @Valid @RequestBody com.jaixostudio.backend.dto.ChangePasswordRequest request) {
+        authService.changePassword(request);
+        return ResponseEntity.ok(ApiResponse.ok("Password changed successfully", null));
+    }
 }

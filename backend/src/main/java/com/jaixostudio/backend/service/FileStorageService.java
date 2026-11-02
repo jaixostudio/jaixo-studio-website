@@ -41,6 +41,11 @@ public class FileStorageService {
             throw new BadRequestException("Uploaded file is empty.");
         }
 
+        // Limit size to 15MB
+        if (file.getSize() > 15 * 1024 * 1024) {
+            throw new BadRequestException("Uploaded file exceeds the maximum 15MB size limit.");
+        }
+
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_IMAGE_TYPES.contains(contentType.toLowerCase())) {
             throw new BadRequestException("Invalid file type. Only JPEG, PNG, WEBP, and SVG images are accepted.");
@@ -50,7 +55,12 @@ public class FileStorageService {
         String extension = "";
         int dotIndex = originalFilename.lastIndexOf('.');
         if (dotIndex >= 0) {
-            extension = originalFilename.substring(dotIndex);
+            extension = originalFilename.substring(dotIndex).toLowerCase();
+        }
+
+        List<String> allowedExtensions = Arrays.asList(".jpg", ".jpeg", ".png", ".webp", ".svg", ".gif");
+        if (!allowedExtensions.contains(extension)) {
+            throw new BadRequestException("File extension " + extension + " is not permitted.");
         }
 
         String safeFileName = UUID.randomUUID().toString().substring(0, 12) + "-" + 

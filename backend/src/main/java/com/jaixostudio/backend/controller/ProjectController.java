@@ -44,6 +44,12 @@ public class ProjectController {
         return ResponseEntity.ok(ApiResponse.ok("Projects retrieved successfully", projects));
     }
 
+    @GetMapping("/featured")
+    public ResponseEntity<ApiResponse<List<ProjectDto>>> getFeaturedProjects() {
+        List<ProjectDto> projects = projectService.getFeaturedProjects();
+        return ResponseEntity.ok(ApiResponse.ok("Featured projects retrieved successfully", projects));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ProjectDto>> getProjectById(@PathVariable String id) {
         ProjectDto project = projectService.getProjectById(id);

@@ -62,6 +62,18 @@ export async function apiVerifyToken(): Promise<boolean> {
   }
 }
 
+export async function apiChangePassword(currentPassword: string, newPassword: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/auth/change-password`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    throw new Error(json.message || 'Failed to change password');
+  }
+}
+
 // --- PROJECTS API ---
 export async function apiFetchProjects(): Promise<ProjectItem[]> {
   const res = await fetch(`${API_BASE}/projects`);
@@ -206,11 +218,11 @@ export async function apiSubmitEnquiry(enquiry: Omit<EnquirySubmission, 'id' | '
   return json.data;
 }
 
-export async function apiUpdateEnquiryStatus(id: string, status: 'New' | 'In Review' | 'Responded'): Promise<void> {
+export async function apiUpdateEnquiryStatus(id: string, status: string, internalNotes?: string): Promise<void> {
   const res = await fetch(`${API_BASE}/enquiries/${id}/status`, {
     method: 'PUT',
     headers: getHeaders(),
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ status, internalNotes }),
   });
   const json = await res.json();
   if (!res.ok || !json.success) throw new Error(json.message || 'Failed to update enquiry status');

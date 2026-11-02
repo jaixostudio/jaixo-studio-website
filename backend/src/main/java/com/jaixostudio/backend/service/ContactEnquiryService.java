@@ -37,11 +37,14 @@ public class ContactEnquiryService {
     public ContactEnquiry createEnquiry(EnquiryRequestDto dto) {
         ContactEnquiry enquiry = new ContactEnquiry();
         enquiry.setId("enq-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 4));
+        String ref = "JX-" + java.time.Year.now().getValue() + "-" + String.format("%04d", (int)(Math.random() * 9000 + 1000));
+        enquiry.setReferenceNumber(ref);
         enquiry.setName(dto.getName());
         enquiry.setEmail(dto.getEmail());
         enquiry.setPhone(dto.getPhone());
         enquiry.setService(dto.getService());
         enquiry.setBudget(dto.getBudget());
+        enquiry.setTimeline(dto.getTimeline());
         enquiry.setDescription(dto.getDescription());
         enquiry.setStatus("New");
         enquiry.setCreatedAt(LocalDateTime.now());
@@ -50,11 +53,14 @@ public class ContactEnquiryService {
     }
 
     @Transactional
-    public ContactEnquiry updateEnquiryStatus(String id, String status) {
+    public ContactEnquiry updateEnquiryStatus(String id, String status, String internalNotes) {
         ContactEnquiry enquiry = enquiryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Enquiry not found with id: " + id));
 
         enquiry.setStatus(status);
+        if (internalNotes != null) {
+            enquiry.setInternalNotes(internalNotes);
+        }
         return enquiryRepository.save(enquiry);
     }
 

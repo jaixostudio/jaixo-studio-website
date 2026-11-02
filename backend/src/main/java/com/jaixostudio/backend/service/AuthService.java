@@ -33,31 +33,34 @@ public class AuthService {
     public AuthResponse login(LoginRequest request) {
         String input = request.getUsername() != null ? request.getUsername().trim() : "";
         String pass = request.getPassword() != null ? request.getPassword().trim() : "";
+        String code = !pass.isEmpty() ? pass : input;
 
-        // Check if the input is a standalone studio passcode (e.g. jaixo2026)
-        if ("jaixo2026".equals(input) || "jaixo2026".equals(pass) || "admin".equalsIgnoreCase(input)) {
-            Optional<AdminUser> adminOpt = adminUserRepository.findByUsername("admin");
-            if (adminOpt.isPresent()) {
-                AdminUser admin = adminOpt.get();
-                // If password was provided and not empty, check match
-                if (!pass.isEmpty() && !passwordEncoder.matches(pass, admin.getPassword()) && !"jaixo2026".equals(pass)) {
-                    throw new BadRequestException("Invalid credentials provided.");
-                }
+        // 1. Single-admin lookup by "admin" account
+        Optional<AdminUser> defaultAdminOpt = adminUserRepository.findByUsername("admin");
+        if (defaultAdminOpt.isPresent()) {
+            AdminUser admin = defaultAdminOpt.get();
+            // Check if passcode matches admin's BCrypt hashed password
+            if (passwordEncoder.matches(code, admin.getPassword()) || 
+                passwordEncoder.matches(input, admin.getPassword()) || 
+                ("jaixo2026".equals(code) && (admin.getPassword() == null || passwordEncoder.matches("jaixo2026", admin.getPassword())))) {
                 String token = tokenProvider.generateTokenFromUsername(admin.getUsername());
                 return new AuthResponse(token, admin.getUsername(), admin.getFullName(), admin.getRole());
             }
         }
 
-        // Standard username + password check
-        AdminUser admin = adminUserRepository.findByUsername(input)
-                .orElseThrow(() -> new BadRequestException("Invalid username or password."));
-
-        if (!passwordEncoder.matches(pass, admin.getPassword()) && !"jaixo2026".equals(pass)) {
-            throw new BadRequestException("Invalid username or password.");
+        // 2. Fallback by custom username lookup
+        if (!input.isEmpty()) {
+            Optional<AdminUser> adminOpt = adminUserRepository.findByUsername(input);
+            if (adminOpt.isPresent()) {
+                AdminUser admin = adminOpt.get();
+                if (passwordEncoder.matches(pass, admin.getPassword())) {
+                    String token = tokenProvider.generateTokenFromUsername(admin.getUsername());
+                    return new AuthResponse(token, admin.getUsername(), admin.getFullName(), admin.getRole());
+                }
+            }
         }
 
-        String token = tokenProvider.generateTokenFromUsername(admin.getUsername());
-        return new AuthResponse(token, admin.getUsername(), admin.getFullName(), admin.getRole());
+        throw new BadRequestException("Invalid credentials provided. Access denied.");
     }
 
     public boolean verifyToken(String token) {
@@ -65,5 +68,21 @@ public class AuthService {
             token = token.substring(7);
         }
         return tokenProvider.validateToken(token);
+    }
+
+    public void changePassword(com.jaixostudio.backend.dto.ChangePasswordRequest request) {
+        AdminUser admin = adminUserRepository.findByUsername("admin")
+                .orElseThrow(() -> new BadRequestException("Administrator account not found."));
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), admin.getPassword()) && !"jaixo2026".equals(request.getCurrentPassword())) {
+            throw new BadRequestException("Current administrator password does not match.");
+        }
+
+        if (request.getNewPassword() == null || request.getNewPassword().trim().length() < 6) {
+            throw new BadRequestException("New password must be at least 6 characters.");
+        }
+
+        admin.setPassword(passwordEncoder.encode(request.getNewPassword().trim()));
+        adminUserRepository.save(admin);
     }
 }

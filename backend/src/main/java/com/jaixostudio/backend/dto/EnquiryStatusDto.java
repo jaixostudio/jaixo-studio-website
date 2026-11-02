@@ -6,13 +6,23 @@ import jakarta.validation.constraints.Pattern;
 public class EnquiryStatusDto {
 
     @NotBlank(message = "Status cannot be blank")
-    @Pattern(regexp = "^(New|In Review|Responded)$", message = "Status must be New, In Review, or Responded")
+    @Pattern(
+        regexp = "^(New|Contacted|In Discussion|Proposal Sent|Confirmed|Completed|Rejected|In Review|Responded)$",
+        message = "Status must be New, Contacted, In Discussion, Proposal Sent, Confirmed, Completed, Rejected, In Review, or Responded"
+    )
     private String status;
+
+    private String internalNotes;
 
     public EnquiryStatusDto() {}
 
     public EnquiryStatusDto(String status) {
         this.status = status;
+    }
+
+    public EnquiryStatusDto(String status, String internalNotes) {
+        this.status = status;
+        this.internalNotes = internalNotes;
     }
 
     public String getStatus() {
@@ -21,5 +31,13 @@ public class EnquiryStatusDto {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getInternalNotes() {
+        return internalNotes;
+    }
+
+    public void setInternalNotes(String internalNotes) {
+        this.internalNotes = internalNotes;
     }
 }

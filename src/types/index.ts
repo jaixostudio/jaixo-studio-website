@@ -69,14 +69,29 @@ export interface SiteConfig {
   workingHours: string;
 }
 
+export type EnquiryStatus = 
+  | 'New'
+  | 'Contacted'
+  | 'In Discussion'
+  | 'Proposal Sent'
+  | 'Confirmed'
+  | 'Completed'
+  | 'Rejected'
+  | 'In Review'
+  | 'Responded';
+
 export interface EnquirySubmission {
   id: string;
-  timestamp: string;
+  referenceNumber?: string;
+  timestamp?: string;
+  createdAt?: string;
   name: string;
   email: string;
   phone: string;
   service: string;
   budget: string;
+  timeline?: string;
   description: string;
-  status: 'New' | 'In Review' | 'Responded';
+  status: EnquiryStatus;
+  internalNotes?: string;
 }

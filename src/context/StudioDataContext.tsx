@@ -39,8 +39,8 @@ interface StudioContextType {
   moveProject: (id: string, direction: 'up' | 'down') => Promise<void> | void;
   toggleFeaturedProject: (id: string) => Promise<void> | void;
   enquiries: EnquirySubmission[];
-  submitEnquiry: (enquiry: Omit<EnquirySubmission, 'id' | 'timestamp' | 'status'>) => Promise<boolean> | boolean;
-  updateEnquiryStatus: (id: string, status: 'New' | 'In Review' | 'Responded') => Promise<void> | void;
+  submitEnquiry: (enquiry: Omit<EnquirySubmission, 'id' | 'timestamp' | 'status'>) => Promise<EnquirySubmission>;
+  updateEnquiryStatus: (id: string, status: any, internalNotes?: string) => Promise<void> | void;
   deleteEnquiry: (id: string) => Promise<void> | void;
   selectedProjectForModal: ProjectItem | null;
   openProjectModal: (project: ProjectItem) => void;
@@ -352,11 +352,14 @@ export const StudioDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
-  const submitEnquiry = async (enquiryData: Omit<EnquirySubmission, 'id' | 'timestamp' | 'status'>) => {
+  const submitEnquiry = async (enquiryData: Omit<EnquirySubmission, 'id' | 'timestamp' | 'status'>): Promise<EnquirySubmission> => {
     const tempId = `enq-${Date.now()}`;
-    const newSubmission: EnquirySubmission = {
+    const year = new Date().getFullYear();
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    let newSubmission: EnquirySubmission = {
       ...enquiryData,
       id: tempId,
+      referenceNumber: `JX-${year}-${randomSuffix}`,
       timestamp: new Date().toISOString(),
       status: 'New',
     };
@@ -365,22 +368,25 @@ export const StudioDataProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     if (isBackendConnected) {
       try {
         const created = await apiSubmitEnquiry(enquiryData);
-        setEnquiries((prev) => prev.map((e) => (e.id === tempId ? created : e)));
+        if (created) {
+          newSubmission = created;
+          setEnquiries((prev) => prev.map((e) => (e.id === tempId ? created : e)));
+        }
       } catch (err) {
         console.error('Failed to submit enquiry to backend:', err);
       }
     }
-    return true;
+    return newSubmission;
   };
 
-  const updateEnquiryStatus = async (id: string, status: 'New' | 'In Review' | 'Responded') => {
+  const updateEnquiryStatus = async (id: string, status: any, internalNotes?: string) => {
     setEnquiries((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, status } : e))
+      prev.map((e) => (e.id === id ? { ...e, status, ...(internalNotes !== undefined ? { internalNotes } : {}) } : e))
     );
 
     if (isBackendConnected) {
       try {
-        await apiUpdateEnquiryStatus(id, status);
+        await apiUpdateEnquiryStatus(id, status, internalNotes);
       } catch (err) {
         console.error('Failed to update enquiry status on backend:', err);
       }

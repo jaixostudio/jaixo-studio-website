@@ -30,8 +30,17 @@ public class ContactEnquiry {
     @Column(length = 100)
     private String budget;
 
+    @Column(length = 100)
+    private String timeline;
+
+    @Column(length = 50)
+    private String referenceNumber;
+
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(columnDefinition = "TEXT")
+    private String internalNotes;
 
     @Column(nullable = false, length = 50)
     private String status = "New";
@@ -113,6 +122,30 @@ public class ContactEnquiry {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getTimeline() {
+        return timeline;
+    }
+
+    public void setTimeline(String timeline) {
+        this.timeline = timeline;
+    }
+
+    public String getReferenceNumber() {
+        return referenceNumber;
+    }
+
+    public void setReferenceNumber(String referenceNumber) {
+        this.referenceNumber = referenceNumber;
+    }
+
+    public String getInternalNotes() {
+        return internalNotes;
+    }
+
+    public void setInternalNotes(String internalNotes) {
+        this.internalNotes = internalNotes;
     }
 
     public LocalDateTime getCreatedAt() {

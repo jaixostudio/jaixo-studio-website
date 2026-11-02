@@ -31,4 +31,17 @@ public class LoginRequest {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public void setPasscode(String passcode) {
+        if (this.username == null || this.username.isEmpty()) {
+            this.username = passcode;
+        }
+        if (this.password == null || this.password.isEmpty()) {
+            this.password = passcode;
+        }
+    }
+
+    public String getPasscode() {
+        return this.password != null ? this.password : this.username;
+    }
 }

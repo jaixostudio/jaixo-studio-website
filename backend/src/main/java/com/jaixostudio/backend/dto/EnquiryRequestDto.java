@@ -15,6 +15,7 @@ public class EnquiryRequestDto {
     private String phone;
     private String service;
     private String budget;
+    private String timeline;
     private String description;
 
     public EnquiryRequestDto() {}
@@ -57,6 +58,14 @@ public class EnquiryRequestDto {
 
     public void setBudget(String budget) {
         this.budget = budget;
+    }
+
+    public String getTimeline() {
+        return timeline;
+    }
+
+    public void setTimeline(String timeline) {
+        this.timeline = timeline;
     }
 
     public String getDescription() {

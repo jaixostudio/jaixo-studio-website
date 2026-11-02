@@ -11,15 +11,21 @@ export const QuickEnquiryModal: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [service, setService] = useState('');
   const [budget, setBudget] = useState('₹15,000 – ₹30,000');
+  const [timeline, setTimeline] = useState('Within 1-2 weeks');
   const [description, setDescription] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittedRef, setSubmittedRef] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (quickEnquiryService) {
       setService(quickEnquiryService);
       setIsSubmitted(false);
       setErrors({});
+      setSubmittedRef(null);
+      setSubmitError(null);
     }
   }, [quickEnquiryService]);
 
@@ -41,20 +47,30 @@ export const QuickEnquiryModal: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validate() || isSubmitting) return;
 
-    submitEnquiry({
-      name,
-      email,
-      phone,
-      service,
-      budget,
-      description,
-    });
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      const res = await submitEnquiry({
+        name,
+        email,
+        phone,
+        service,
+        budget,
+        timeline,
+        description,
+      });
 
-    setIsSubmitted(true);
+      setSubmittedRef(res?.referenceNumber || null);
+      setIsSubmitted(true);
+    } catch (err: any) {
+      setSubmitError(err.message || 'Submission failed. Please try again or WhatsApp us.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleWhatsAppDirect = () => {
@@ -99,6 +115,12 @@ export const QuickEnquiryModal: React.FC = () => {
               <h3 className="text-2xl font-heading font-bold text-[#F5F5F2]">
                 Enquiry Dispatched
               </h3>
+              {submittedRef && (
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#080B12] border border-[#078BFF]/50 text-xs text-[#078BFF] font-mono font-semibold">
+                  <span>Reference:</span>
+                  <span className="text-white">{submittedRef}</span>
+                </div>
+              )}
               <p className="text-sm text-[#A5AAB5] max-w-md mx-auto leading-relaxed">
                 Thank you, <strong className="text-white">{name}</strong>. Your project brief has been registered in the studio database. We will review your requirements and reach out within 12–24 hours.
               </p>
@@ -106,13 +128,13 @@ export const QuickEnquiryModal: React.FC = () => {
               <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
                 <button
                   onClick={closeQuickEnquiry}
-                  className="px-6 py-2.5 rounded-lg bg-[#252B36] hover:bg-[#2e3644] text-xs font-semibold uppercase tracking-wider text-white transition-colors"
+                  className="px-6 py-2.5 rounded-lg bg-[#252B36] hover:bg-[#2e3644] text-xs font-semibold uppercase tracking-wider text-white transition-colors cursor-pointer"
                 >
                   Close Window
                 </button>
                 <button
                   onClick={handleWhatsAppDirect}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#078BFF] hover:bg-[#0077e6] text-xs font-semibold uppercase tracking-wider text-white transition-colors"
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#078BFF] hover:bg-[#0077e6] text-xs font-semibold uppercase tracking-wider text-white transition-colors cursor-pointer"
                 >
                   <MessageCircle className="w-4 h-4" />
                   <span>Connect on WhatsApp Now</span>
@@ -121,6 +143,12 @@ export const QuickEnquiryModal: React.FC = () => {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              {submitError && (
+                <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 text-xs">
+                  {submitError}
+                </div>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Name */}
                 <div>
@@ -198,26 +226,52 @@ export const QuickEnquiryModal: React.FC = () => {
                 </div>
               </div>
 
-              {/* Budget Range */}
-              <div>
-                <label className="block text-xs font-heading font-semibold uppercase tracking-wider text-[#A5AAB5] mb-1.5">
-                  Estimated Budget Range
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {['Under ₹10,000', '₹10,000 – ₹25,000', '₹25,000 – ₹50,000', '₹50,000+'].map((tier) => (
-                    <button
-                      type="button"
-                      key={tier}
-                      onClick={() => setBudget(tier)}
-                      className={`px-2.5 py-2 rounded-lg text-xs font-medium border text-center transition-colors cursor-pointer ${
-                        budget === tier
-                          ? 'bg-[#10141D] border-[#078BFF] text-[#078BFF]'
-                          : 'bg-[#080B12] border-[#252B36] text-[#A5AAB5] hover:border-[#A5AAB5]/40'
-                      }`}
-                    >
-                      {tier}
-                    </button>
-                  ))}
+              {/* Budget & Timeline Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Budget Range */}
+                <div>
+                  <label className="block text-xs font-heading font-semibold uppercase tracking-wider text-[#A5AAB5] mb-1.5">
+                    Estimated Budget
+                  </label>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {['Under ₹10,000', '₹10,000 – ₹25,000', '₹25,000 – ₹50,000', '₹50,000+'].map((tier) => (
+                      <button
+                        type="button"
+                        key={tier}
+                        onClick={() => setBudget(tier)}
+                        className={`px-2 py-1.5 rounded-lg text-[11px] font-medium border text-center transition-colors cursor-pointer ${
+                          budget === tier
+                            ? 'bg-[#10141D] border-[#078BFF] text-[#078BFF]'
+                            : 'bg-[#080B12] border-[#252B36] text-[#A5AAB5] hover:border-[#A5AAB5]/40'
+                        }`}
+                      >
+                        {tier}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Timeline */}
+                <div>
+                  <label className="block text-xs font-heading font-semibold uppercase tracking-wider text-[#A5AAB5] mb-1.5">
+                    Target Timeline
+                  </label>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {['Within 48h (Urgent)', 'Within 1-2 weeks', 'Within 3-4 weeks', 'Flexible'].map((t) => (
+                      <button
+                        type="button"
+                        key={t}
+                        onClick={() => setTimeline(t)}
+                        className={`px-2 py-1.5 rounded-lg text-[11px] font-medium border text-center transition-colors cursor-pointer ${
+                          timeline === t
+                            ? 'bg-[#10141D] border-[#078BFF] text-[#078BFF]'
+                            : 'bg-[#080B12] border-[#252B36] text-[#A5AAB5] hover:border-[#A5AAB5]/40'
+                        }`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -242,13 +296,23 @@ export const QuickEnquiryModal: React.FC = () => {
               </div>
 
               {/* Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-3">
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
                 <button
                   type="submit"
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-[#078BFF] hover:bg-[#0077e6] text-white text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer shadow-lg shadow-[#078BFF]/20"
+                  disabled={isSubmitting}
+                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-[#078BFF] hover:bg-[#0077e6] disabled:opacity-50 text-white text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer shadow-lg shadow-[#078BFF]/20"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>Send Studio Brief</span>
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Sending Brief...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      <span>Send Studio Brief</span>
+                    </>
+                  )}
                 </button>
 
                 <button
@@ -260,6 +324,10 @@ export const QuickEnquiryModal: React.FC = () => {
                   <span>Quick WhatsApp</span>
                 </button>
               </div>
+
+              <p className="text-[10px] text-[#A5AAB5]/70 text-center leading-relaxed">
+                Privacy Notice: We treat all inquiries with strict confidentiality. Direct communication only.
+              </p>
             </form>
           )}
         </div>

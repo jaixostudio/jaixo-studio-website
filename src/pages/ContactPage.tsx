@@ -21,10 +21,14 @@ export const ContactPage: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [service, setService] = useState('Website Design & Development');
   const [budget, setBudget] = useState('₹15,000 – ₹30,000');
+  const [timeline, setTimeline] = useState('Within 1-2 weeks');
   const [description, setDescription] = useState('');
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittedRef, setSubmittedRef] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const cleanPhone = siteConfig.whatsappNumber.replace(/[^0-9]/g, '');
   const directWhatsAppUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(
@@ -47,24 +51,34 @@ export const ContactPage: React.FC = () => {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
+    if (!validate() || isSubmitting) return;
 
-    submitEnquiry({
-      name,
-      email,
-      phone,
-      service,
-      budget,
-      description,
-    });
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      const res = await submitEnquiry({
+        name,
+        email,
+        phone,
+        service,
+        budget,
+        timeline,
+        description,
+      });
 
-    setIsSuccess(true);
+      setSubmittedRef(res?.referenceNumber || null);
+      setIsSuccess(true);
+    } catch (err: any) {
+      setSubmitError(err.message || 'Submission encountered an error. Please retry or contact directly via WhatsApp.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleSendToWhatsApp = () => {
-    const message = `*JAIXO STUDIO Contact Enquiry*\n\n*Name:* ${name || 'Prospective Client'}\n*Email:* ${email || 'Not supplied'}\n*Phone:* ${phone || 'Not supplied'}\n*Service:* ${service}\n*Budget:* ${budget}\n\n*Requirements:*\n${description || 'I would like to discuss a project with JAIXO STUDIO.'}`;
+    const message = `*JAIXO STUDIO Contact Enquiry*\n\n*Name:* ${name || 'Prospective Client'}\n*Email:* ${email || 'Not supplied'}\n*Phone:* ${phone || 'Not supplied'}\n*Service:* ${service}\n*Budget:* ${budget}\n*Timeline:* ${timeline}\n\n*Requirements:*\n${description || 'I would like to discuss a project with JAIXO STUDIO.'}`;
     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -195,15 +209,21 @@ export const ContactPage: React.FC = () => {
           <div className="lg:col-span-7">
             <div className="p-8 sm:p-10 rounded-3xl bg-[#0F131D] border border-[#252B36]">
               {isSuccess ? (
-                <div className="text-center py-12 space-y-5">
+                <div className="text-center py-12 space-y-5 animate-fade-in">
                   <div className="w-16 h-16 rounded-full bg-[#078BFF]/10 border border-[#078BFF]/40 text-[#078BFF] flex items-center justify-center mx-auto">
                     <CheckCircle className="w-8 h-8" />
                   </div>
                   <h3 className="text-2xl font-heading font-bold text-[#F5F5F2]">
                     Enquiry Successfully Received
                   </h3>
+                  {submittedRef && (
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#080B12] border border-[#078BFF]/50 text-xs text-[#078BFF] font-mono font-semibold">
+                      <span>Reference Number:</span>
+                      <span className="text-white">{submittedRef}</span>
+                    </div>
+                  )}
                   <p className="text-sm text-[#A5AAB5] max-w-md mx-auto leading-relaxed">
-                    Thank you, <strong className="text-white">{name}</strong>. Your project brief for <strong className="text-white">{service}</strong> has been logged in our studio workflow. We will analyze your requirements and get back to you with a roadmap.
+                    Thank you, <strong className="text-white">{name}</strong>. Your project brief for <strong className="text-white">{service}</strong> has been logged in our studio database. We will analyze your requirements and get back to you with an itemized proposal.
                   </p>
 
                   <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -214,14 +234,15 @@ export const ContactPage: React.FC = () => {
                         setEmail('');
                         setPhone('');
                         setDescription('');
+                        setSubmittedRef(null);
                       }}
-                      className="px-6 py-2.5 rounded-lg bg-[#252B36] hover:bg-[#2e3644] text-xs font-semibold uppercase tracking-wider text-white transition-colors"
+                      className="px-6 py-2.5 rounded-lg bg-[#252B36] hover:bg-[#2e3644] text-xs font-semibold uppercase tracking-wider text-white transition-colors cursor-pointer"
                     >
                       Submit Another Request
                     </button>
                     <button
                       onClick={handleSendToWhatsApp}
-                      className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#078BFF] hover:bg-[#0077e6] text-xs font-semibold uppercase tracking-wider text-white transition-colors"
+                      className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#078BFF] hover:bg-[#0077e6] text-xs font-semibold uppercase tracking-wider text-white transition-colors cursor-pointer"
                     >
                       <MessageCircle className="w-4 h-4" />
                       <span>Ping on WhatsApp</span>
@@ -238,6 +259,12 @@ export const ContactPage: React.FC = () => {
                       Fill out the details below to receive an itemized proposal and delivery schedule.
                     </p>
                   </div>
+
+                  {submitError && (
+                    <div className="p-3.5 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 text-xs">
+                      {submitError}
+                    </div>
+                  )}
 
                   {/* Name and Email */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -316,38 +343,69 @@ export const ContactPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Project Budget Tier */}
-                  <div>
-                    <label className="block text-xs font-heading font-semibold uppercase tracking-wider text-[#A5AAB5] mb-2">
-                      Estimated Project Budget (INR)
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                      {[
-                        'Under ₹10,000',
-                        '₹10,000 – ₹25,000',
-                        '₹25,000 – ₹50,000',
-                        '₹50,000+',
-                      ].map((tier) => (
-                        <button
-                          type="button"
-                          key={tier}
-                          onClick={() => setBudget(tier)}
-                          className={`py-2.5 px-3 rounded-xl text-xs font-medium border text-center transition-colors cursor-pointer ${
-                            budget === tier
-                              ? 'bg-[#10141D] border-[#078BFF] text-[#078BFF] font-semibold'
-                              : 'bg-[#080B12] border-[#252B36] text-[#A5AAB5] hover:border-[#A5AAB5]/50'
-                          }`}
-                        >
-                          {tier}
-                        </button>
-                      ))}
+                  {/* Budget & Timeline Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Project Budget Tier */}
+                    <div>
+                      <label className="block text-xs font-heading font-semibold uppercase tracking-wider text-[#A5AAB5] mb-2">
+                        Estimated Budget (INR)
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          'Under ₹10,000',
+                          '₹10,000 – ₹25,000',
+                          '₹25,000 – ₹50,000',
+                          '₹50,000+',
+                        ].map((tier) => (
+                          <button
+                            type="button"
+                            key={tier}
+                            onClick={() => setBudget(tier)}
+                            className={`py-2 px-2.5 rounded-xl text-[11px] font-medium border text-center transition-colors cursor-pointer ${
+                              budget === tier
+                                ? 'bg-[#10141D] border-[#078BFF] text-[#078BFF] font-semibold'
+                                : 'bg-[#080B12] border-[#252B36] text-[#A5AAB5] hover:border-[#A5AAB5]/50'
+                            }`}
+                          >
+                            {tier}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Timeline Expectation */}
+                    <div>
+                      <label className="block text-xs font-heading font-semibold uppercase tracking-wider text-[#A5AAB5] mb-2">
+                        Target Timeline
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          'Within 48h (Urgent)',
+                          'Within 1-2 weeks',
+                          'Within 3-4 weeks',
+                          'Flexible',
+                        ].map((t) => (
+                          <button
+                            type="button"
+                            key={t}
+                            onClick={() => setTimeline(t)}
+                            className={`py-2 px-2.5 rounded-xl text-[11px] font-medium border text-center transition-colors cursor-pointer ${
+                              timeline === t
+                                ? 'bg-[#10141D] border-[#078BFF] text-[#078BFF] font-semibold'
+                                : 'bg-[#080B12] border-[#252B36] text-[#A5AAB5] hover:border-[#A5AAB5]/50'
+                            }`}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
                   {/* Project Description */}
                   <div>
                     <label className="block text-xs font-heading font-semibold uppercase tracking-wider text-[#A5AAB5] mb-2">
-                      Project Description & Timeline Goals *
+                      Project Description & Scope Goals *
                     </label>
                     <textarea
                       rows={4}
@@ -356,7 +414,7 @@ export const ContactPage: React.FC = () => {
                         setDescription(e.target.value);
                         if (errors.description) setErrors({ ...errors, description: '' });
                       }}
-                      placeholder="Please tell us about your brand, key objectives, reference inspirations, and preferred delivery date..."
+                      placeholder="Please tell us about your brand, key objectives, reference inspirations, and specific deliverables needed..."
                       className="w-full px-4 py-3 rounded-xl bg-[#080B12] border border-[#252B36] focus:border-[#078BFF] focus:outline-none text-sm text-[#F5F5F2] placeholder-[#A5AAB5]/40 transition-colors"
                     />
                     {errors.description && (
@@ -368,10 +426,20 @@ export const ContactPage: React.FC = () => {
                   <div className="flex flex-col sm:flex-row gap-4 pt-2">
                     <button
                       type="submit"
-                      className="flex-1 flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-[#078BFF] hover:bg-[#0077e6] text-white text-xs font-semibold uppercase tracking-wider transition-colors shadow-xl shadow-[#078BFF]/25 cursor-pointer"
+                      disabled={isSubmitting}
+                      className="flex-1 flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-[#078BFF] hover:bg-[#0077e6] disabled:opacity-50 text-white text-xs font-semibold uppercase tracking-wider transition-colors shadow-xl shadow-[#078BFF]/25 cursor-pointer"
                     >
-                      <Send className="w-4 h-4" />
-                      <span>Submit Project Brief</span>
+                      {isSubmitting ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>Submitting Brief...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4" />
+                          <span>Submit Project Brief</span>
+                        </>
+                      )}
                     </button>
 
                     <button
@@ -383,6 +451,11 @@ export const ContactPage: React.FC = () => {
                       <span>Direct via WhatsApp</span>
                     </button>
                   </div>
+
+                  {/* Privacy Notice */}
+                  <p className="text-[11px] text-[#A5AAB5]/70 text-center leading-relaxed pt-2">
+                    Privacy Notice: Your project details, contact email, and phone number are kept strictly confidential. Used exclusively for official JAIXO STUDIO direct proposals.
+                  </p>
                 </form>
               )}
             </div>
